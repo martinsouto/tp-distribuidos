@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from app.resources import collection
 
 def create_app():
     app = Flask(__name__)
@@ -11,5 +12,7 @@ def create_app():
     @app.route("/")
     def hello_world():
         return "<p>Hello, Braian!</p>"
+    
+    app.register_blueprint(collection.bp)
     
     return app

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Creacion de coleccion{% endblock%}
+
+{% block header %}
+<h1>Creación de colección</h1>
+{% endblock%}
+
+{% block content%}
+<form action="" method="post">
+    <p><label for="description">Description </label>
+    <br>
+    <input type="text" name="description" id="description" required></p>
+    <p><input type="submit" value="Create" name="create" id="create">
+    <input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
+</form>
+{% endblock%}
