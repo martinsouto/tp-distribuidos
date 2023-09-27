@@ -5,9 +5,8 @@ from app.resources import collection
 def create_app():
     app = Flask(__name__)
 
-    app.config.from_mapping(
-        SECRET_KEY=os.environ.get('SECRET_KEY'),
-    )
+    # Configura una clave secreta
+    app.config['SECRET_KEY'] = 'dssd'  # Reemplaza 'tu_clave_secreta_aqui' por una clave secreta real y segura
 
     @app.route("/")
     def hello_world():
