@@ -14,6 +14,7 @@ def create():
     if form.validate_on_submit():
         response = portal_login();
         nombre = form.nombre.data
+        #por ahora no hacemos nada con los datos del formulario por que no tenemos modelos
         # Se instancia la tarea
         case_id = init_process()
         # Obtengo id de tarea

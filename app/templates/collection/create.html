@@ -11,7 +11,18 @@
     {{ form.hidden_tag() }} {# Agrega un campo oculto para protección CSRF #}
     <p><label for="{{ form.nombre.id }}">Nombre</label></p>
     <p>{{ form.nombre(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.descripcion.id }}">Descripción</label></p>
+    <p>{{ form.descripcion(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.plazo_fabricacion.id }}">Plazo de fabricación</label></p>
+    <p>{{ form.plazo_fabricacion(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.fecha_lanzamiento_estimada.id }}">Fecha de lanzamiento estimada</label></p>
+    <p>{{ form.fecha_lanzamiento_estimada(size=40, required="required") }}</p>
+
     <p><input type="submit" value="Create" name="create" id="create"></p>
     <p><input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
 </form>
 {% endblock %}
+
