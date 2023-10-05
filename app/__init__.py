@@ -15,7 +15,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'dssd'  # Reemplaza 'tu_clave_secreta_aqui' por una clave secreta real y segura
 
     # BD
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/probando2'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:GameOver1@localhost/probando2'
 
     # inicializo
     db.init_app(app)

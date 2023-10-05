@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Creación de modelo{% endblock%}
+
+{% block header %}
+<h1>Creación de modelo</h1>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+    {{ form.hidden_tag() }} {# Agrega un campo oculto para protección CSRF #}
+
+    <p><label for="{{ form.nombre.id }}">Nombre</label></p>
+    <p>{{ form.nombre(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.tipo.id }}">Tipo</label></p>
+    <p>{{ form.tipo(required="required") }}</p>
+
+    <p><input type="submit" value="Create" name="create" id="create"></p>
+    <p><input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
+    <p><input type="submit" value="Add another model" name="next" id="next"></p>
+</form>
+{% endblock %}

@@ -15,14 +15,14 @@
     <p><label for="{{ form.descripcion.id }}">Descripción</label></p>
     <p>{{ form.descripcion(size=40, required="required") }}</p>
 
-    <p><label for="{{ form.plazo_fabricacion.id }}">Plazo de fabricación</label></p>
+    <p><label for="{{ form.plazo_fabricacion.id }}">Plazo de fabricación (en días)</label></p>
     <p>{{ form.plazo_fabricacion(size=40, required="required") }}</p>
 
     <p><label for="{{ form.fecha_lanzamiento_estimada.id }}">Fecha de lanzamiento estimada</label></p>
     <p>{{ form.fecha_lanzamiento_estimada(size=40, required="required") }}</p>
 
-    <p><input type="submit" value="Create" name="create" id="create"></p>
     <p><input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
+    <p><input type="submit" value="Add models" name="next" id="next"></p>
 </form>
 {% endblock %}
 
