@@ -1,7 +1,7 @@
 from flask import render_template, redirect, session, url_for, request, flash
 import requests
 
-def portal_login():
+def loginBonita():
     """Se logea y obtiene la cookie de bonita"""
     URL = "http://localhost:8080/bonita/loginservice"
     body = {"username": "walter.bates", "password": "bpm", "redirect": "false"}

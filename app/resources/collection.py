@@ -1,9 +1,13 @@
+import datetime
 from pipes import quote
 from app.form.coleccion.alta_coleccion import FormAltaColeccion
-from app.resources.auth import portal_login
+from app.models.coleccion import Coleccion
+from app.resources.auth import loginBonita
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 import json  # Importa la biblioteca json
 import requests  # Importa la biblioteca requests
+from datetime import datetime
+
 
 bp = Blueprint('collection', __name__, url_prefix="/collection")
 
@@ -12,7 +16,7 @@ def create():
     """Creación de una nueva coleccion"""
     form = FormAltaColeccion()
     if form.validate_on_submit():
-        response = portal_login();
+        response = loginBonita();
         nombre = form.nombre.data
         #por ahora no hacemos nada con los datos del formulario por que no tenemos modelos
         # Se instancia la tarea
@@ -20,6 +24,12 @@ def create():
         # Obtengo id de tarea
         taskId = getUserTaskByName("Planificar la coleccion", case_id)
         # Se le asigna la tarea al usuario que creó la colección
+        #Coleccion.create(
+        #        nombre coleccion,
+        #        "descripcion coleccion",
+        #        "plazo de fabricacion",
+        #        datetime.now(),
+        #    )
         assign_task(taskId)
         # Se finaliza la tarea
         updateUserTask(taskId, "completed")
