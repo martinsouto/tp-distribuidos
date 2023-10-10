@@ -2,7 +2,7 @@ import datetime
 from pipes import quote
 from app.form.coleccion.alta_coleccion import FormAltaColeccion
 from app.form.modelo.alta_modelo import FormAltaModelo
-from app.models.coleccion import Coleccion
+from app.models.collection import Collection
 from app.resources.auth import loginBonita
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 import json  # Importa la biblioteca json
