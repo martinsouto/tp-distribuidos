@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template
-#from app.db import db
+from app.db import db
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
@@ -18,7 +18,7 @@ def create_app():
     )
 
     #from app import db
-    db = SQLAlchemy()
+    #db = SQLAlchemy()
     db.init_app(app)
     
     from app.models.collection import Collection
