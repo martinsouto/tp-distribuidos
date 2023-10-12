@@ -1,20 +1,21 @@
 import os
 from flask import Flask, render_template
 from app.db import db
+from app.db_config import db_config
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
 
 def create_app():
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{os.environ.get('FLASK_DATABASE_USER')}:{os.environ.get('FLASK_DATABASE_PASSWORD')}@{os.environ.get('FLASK_DATABASE_HOST')}/{os.environ.get('FLASK_DATABASE')}"
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{db_config.get('USER')}:{db_config.get('PASSWORD')}@{db_config.get('HOST')}/{db_config.get('DATABASE')}"
 
     app.config.from_mapping(
         SECRET_KEY='mikey',
-        DATABASE_HOST=os.environ.get('FLASK_DATABASE_HOST'),
-        DATABASE_USER=os.environ.get('FLASK_DATABASE_USER'),
-        DATABASE_PASSWORD=os.environ.get('FLASK_DATABASE_PASSWORD'),
-        DATABASE=os.environ.get('FLASK_DATABASE'),
+        DATABASE_HOST=db_config.get("HOST"),
+        DATABASE_USER=db_config.get("USER"),
+        DATABASE_PASSWORD=db_config.get("PASSWORD"),
+        DATABASE=db_config.get("DATABASE"),
     )
 
     #from app import db
