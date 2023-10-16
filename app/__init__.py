@@ -23,6 +23,7 @@ def create_app():
     db.init_app(app)
     
     from app.models.collection import Collection
+    from app.models.user import User
     
     with app.app_context():
         db.create_all()
@@ -31,9 +32,10 @@ def create_app():
     def hello_world():
         return "<p>Hello, Braian!</p>"
     
-    from app.resources import collection
+    from app.resources import collection, auth
     
     app.register_blueprint(collection.bp)
+    app.register_blueprint(auth.bp)
 
     
     return app

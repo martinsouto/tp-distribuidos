@@ -3,16 +3,18 @@ from pipes import quote
 from app.form.coleccion.alta_coleccion import FormAltaColeccion
 from app.form.modelo.alta_modelo import FormAltaModelo
 from app.models.collection import Collection
-from app.resources.auth import loginBonita
+from app.resources.auth2 import loginBonita
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 import json  # Importa la biblioteca json
 import requests  # Importa la biblioteca requests
 from datetime import datetime
+from app.resources.auth import login_required
 
 
 bp = Blueprint('collection', __name__, url_prefix="/collection")
 
 @bp.route('/create', methods=['POST','GET'])
+@login_required
 def create():
     """Creación de una nueva coleccion"""
     form = FormAltaColeccion()
