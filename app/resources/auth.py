@@ -2,6 +2,7 @@ import functools
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.models.user import User
+from app.resources.bonita import loginBonita
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -41,6 +42,7 @@ def login():
                 error = "Incorrect username and/or password"
             else:
                 session.clear()
+                loginBonita(username, password)
                 session['user_id'] = user.id
                 return redirect(url_for('collection.create'))
 
