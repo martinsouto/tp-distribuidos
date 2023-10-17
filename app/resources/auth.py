@@ -19,9 +19,14 @@ def register():
         elif User.find_by_username(username) is not None:
             error = "User {} already exists, try a different username".format(username)
         else:
-            user = User(username=username, password=generate_password_hash(password))
-            User.create(user)
-            return redirect(url_for('auth.login')) 
+            session.clear()
+            response = loginBonita(username, password)
+            if response.status_code != 204:
+                error = "User {} not found in Bonita's user pool".format(username)
+            else:
+                user = User(username=username, password=generate_password_hash(password))
+                User.create(user)
+                return redirect(url_for('auth.login'))
         flash(error)
     
     return render_template('auth/register.html')
@@ -42,9 +47,12 @@ def login():
                 error = "Incorrect username and/or password"
             else:
                 session.clear()
-                loginBonita(username, password)
-                session['user_id'] = user.id
-                return redirect(url_for('collection.create'))
+                response = loginBonita(username, password)
+                if response.status_code != 204:
+                    error = "User {} not found in Bonita's user pool".format(username)
+                else:
+                    session['user_id'] = user.id
+                    return redirect(url_for('collection.create'))
 
         flash(error)
 
