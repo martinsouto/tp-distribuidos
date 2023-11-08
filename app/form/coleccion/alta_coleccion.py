@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Length
-from datetime import date
+from wtforms import StringField, SubmitField, DateField, IntegerField
+from wtforms.validators import DataRequired, Length, ValidationError, NumberRange
+from datetime import date, datetime, timedelta
+from app.models.collection import Coleccion
+
 
 class FormAltaColeccion(FlaskForm):
 
@@ -9,26 +11,6 @@ class FormAltaColeccion(FlaskForm):
         "Nombre",
         validators=[
             DataRequired(message="El campo nombre es obligatorio"),
-            Length(min=2, max=40, message="El mínimo de caracteres es 2 y el máximo 40"),
-        ],
-        default="",
-    )
-
-    descripcion = TextAreaField(
-        "Descripción",
-        validators=[
-            DataRequired(message="El campo descripción es obligatorio"),
-            Length(
-                min=10, max=200, message="El mínimo de caracteres es 10 y el máximo 200"
-            ),
-        ],
-        default="",
-    )
-
-    plazo_fabricacion = StringField(
-        "Plazo de Fabricación",
-        validators=[
-            DataRequired(message="El campo plazo de fabricación es obligatorio"),
             Length(
                 min=2, max=40, message="El mínimo de caracteres es 2 y el máximo 40"
             ),
@@ -36,10 +18,23 @@ class FormAltaColeccion(FlaskForm):
         default="",
     )
 
-    fecha_lanzamiento_estimada = DateField(
-        "Fecha de Lanzamiento Estimada",
-        validators=[DataRequired(message="El campo fecha de lanzamiento es obligatorio")],
-        default=date.today(),
+    cantidad_muebles = IntegerField("Cantidad de muebles", validators=[NumberRange(min=1, max=999999, message="La cantidad de muebles debe ser mayor a 0"), DataRequired(message="El campo cantidad de muebles es obligatorio")])
+
+    def validate_nombre(form, nombreV):
+        coleccion = Coleccion.get_by_name(nombreV.data)
+        if coleccion != None:
+            raise ValidationError("Ya existe ese nombre para otra colección")
+
+    fecha_lanzamiento = DateField(
+        "fecha_lanzamiento",
+        default=date.today() + timedelta(30),
+        validators=[DataRequired()],
     )
 
-    enviar = SubmitField("Create")
+    enviar = SubmitField("Guardar")
+
+    def validate_fecha_lanzamiento(self, f):
+        if f.data <= date.today() + timedelta(30):
+            raise ValidationError(
+                "La fecha de lanzamiento debe ser al menos 30 días posterior a la fecha actual"
+            )

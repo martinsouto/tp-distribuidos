@@ -1,6 +1,6 @@
 db_config = {
     "USER": "root",
-    "PASSWORD": "GameOver1",
+    "PASSWORD": "password",
     "HOST": "localhost",
-    "DATABASE": "grupo7"
+    "DATABASE": "dssd"
 }

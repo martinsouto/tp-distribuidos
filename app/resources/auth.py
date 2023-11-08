@@ -2,7 +2,9 @@ import functools
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.models.user import User
-from app.resources.bonita import loginBonita
+from app.resources.bonita import getUserMembership, loginBonita, logoutBonita
+from flask_login import current_user
+from flask_login import login_user, logout_user, login_required
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -33,48 +35,35 @@ def register():
 
 @bp.route('/login', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        error = None
-        if not username:
-            error = 'Username is required'
-        elif not password:
-            error = 'Password is required'
-        else:
-            user: User = User.find_by_username(username)
-            if (user is None) or (not check_password_hash(pwhash=user.password, password=password)):
-                error = "Incorrect username and/or password"
-            else:
-                session.clear()
-                response = loginBonita(username, password)
-                if response.status_code != 204:
-                    error = "User {} not found in Bonita's user pool".format(username)
-                else:
-                    session['user_id'] = user.id
-                    return redirect(url_for('collection.create'))
+  if request.method == 'POST':
+    username = request.form['username']
+    password = request.form['password']
+    #remember = True if request.form.get("remember") else False
+    user: User = User.find_by_username(username)
+    print(user)
+    # Chequeamos si existe el usuario
+    # Chequeamos si la contraseña corresponde con la hasheada
+    #falta agregar esta condicion al IF: or user.password != password
+    if not user:
+        flash("El usuario y/o la contraseña son incorrectos.")
+        return render_template('auth/login.html')
+        # if user doesn't exist or password is wrong, reload the page
 
-        flash(error)
+    # chequeamos si el usuario existe en la organización de bonita
+    response = loginBonita(user.username, password)
+    if response.status_code != 204:
+        flash("El usuario no forma parte de la organización.")
+        return render_template('auth/login.html')
+    # if the above check passes, then we know the user has the right credentials
+    login_user(user)
+    session["current_rol"] = getUserMembership()
+    return redirect(url_for('home'))
+  return render_template('auth/login.html')
 
-    return render_template('auth/login.html')
-
+@login_required
 @bp.route('/logout', methods=['POST','GET'])
 def logout():
-    session.clear()
-    return redirect(url_for('collection.create'))
-
-@bp.before_app_request
-def load_logged_in_user():
-    if session.get('user_id') is None:
-        g.user = None
-    else:
-        g.user = User.find_by_id(session.get('user_id'))
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    
-    return wrapped_view
+    # logout de bonita
+    logoutBonita()
+    logout_user()
+    return redirect('login')
