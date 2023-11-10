@@ -142,7 +142,7 @@ def guardar_materiales(id_coleccion):
         Coleccion.get_by_id(id_coleccion).save_materials(str(json.dumps(listado)))
         set_bonita_variable(
             Coleccion.get_by_id(id_coleccion).case_id,
-            "materiales_disponibles",
+            "hay_materiales",
             "true",
             "java.lang.Boolean",
         )
@@ -181,6 +181,7 @@ def recibir_materiales(id_coleccion):
     return redirect(url_for("home"))
 
 # ESPACIOS
+@bp.route('/<int:id_coleccion>/reservar_espacio', methods=['POST'])
 @login_required
 def reservar_espacio(id_coleccion):
     """Se reserva un espacio"""
@@ -190,25 +191,25 @@ def reservar_espacio(id_coleccion):
         set_bonita_variable(
                 case_id, "materiales_atrasados", "false", "java.lang.Boolean"
             )
-        while ("Consultar espacio de fabricación" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+        while ("Consulta de espacio de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
             print("Cargando...")
         taskId = getUserTaskByName(
-            "Consultar espacio de fabricación",
+            "Consulta de espacio de fabricacion",
             case_id,
         )
-        # Seteo la variable de bonita plazos_fabricacion
+        # Seteo la variable de bonita sedes_disponibles
         set_bonita_variable(
-            case_id, "plazos_fabricacion", "true", "java.lang.Boolean"
+            case_id, "sedes_disponibles", "true", "java.lang.Boolean"
         )
         assign_task(taskId)
         # Se finaliza la tarea
         updateUserTask(taskId, "completed")
 
         # Reservo los materiales guardados (si es que no los tengo, eso lo chequea bonita automaticamente con la variable "materiales_disponibles")
-        while ("Reservar materiales" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+        while ("Reserva de materiales necesarios" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
             print("Cargando...")
         taskId = getUserTaskByName(
-            "Reservar materiales",
+            "Reserva de materiales necesarios",
             case_id,
         )
         assign_task(taskId)
@@ -217,10 +218,10 @@ def reservar_espacio(id_coleccion):
         # Se finaliza la tarea
         updateUserTask(taskId, "completed")
 
-        while ("Reservar espacio de fabricación" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+        while ("Reserva de espacio de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
             print("Cargando...")
         taskId = getUserTaskByName(
-            "Reservar espacio de fabricación",
+            "Reserva de espacio de fabricacion",
             case_id,
         )
         assign_task(taskId)
@@ -246,8 +247,10 @@ def reservar_espacio(id_coleccion):
 @login_required
 def login_api_espacios():
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/login"
-    body = {"username": current_user.username, "password": current_user.password}
+    URL = "http://127.0.0.1:6000/login"
+    #body = {"username": current_user.username, "password": current_user.password}
+    #hardcodeo con el usuario y contraseña que tengo en la base de datos de la api
+    body = {"username": "martin", "password": "1234"}
     headers = {"Content-Type": "application/json"}
     data = json.dumps(body)
     response = requestSession.put(URL, data=data, headers=headers)
@@ -259,7 +262,7 @@ def login_api_espacios():
 @login_required
 def listado_api_espacios(token, end_date):
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/espacios"
+    URL = "http://127.0.0.1:6000/espacios"
     body = {"end_date": end_date}
     headers = {"Content-Type": "application/json", "Authorization": "Bearer " + token}
     data = json.dumps(body)
@@ -271,7 +274,7 @@ def listado_api_espacios(token, end_date):
 @login_required
 def reservar_api_espacios(token, space_id, id_coleccion):
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/reservar_espacio"
+    URL = "http://127.0.0.1:6000/reservar_espacio"
     body = {
         "space_id": space_id,
         "user_id": int(get_user_id()),
@@ -286,7 +289,7 @@ def reservar_api_espacios(token, space_id, id_coleccion):
     print(espacio)
     return espacio
 
-
+@bp.route('/<int:id_coleccion>/seleccionar_espacio', methods=['GET', 'POST'])
 @login_required
 def seleccionar_espacio(id_coleccion):
     """Template para seleccionar espacio espacio"""
@@ -298,7 +301,7 @@ def seleccionar_espacio(id_coleccion):
         case_id = Coleccion.get_by_id(id_coleccion).case_id
         if espacios:
             return render_template(
-                "coleccion/seleccion_espacio.html",
+                "collection/seleccion_espacio.html",
                 espacios=espacios,
                 id_coleccion=id_coleccion,
                 fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,

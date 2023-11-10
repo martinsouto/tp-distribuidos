@@ -139,19 +139,19 @@
                                     </div>
                                 </td>
                                 {% if session["current_rol"] == "Operaciones" %}
-                                {% if "Consulta de materiales a la API" not in get_ready_tasks(coleccion.case_id) %}
+                                {% if "Definir Materiales necesarios" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
                                         href="{{ url_for('collection.seleccionar_materiales', id_coleccion=coleccion.id) }}">Seleccionar
                                         materiales</a>
                                 </td>
-                                {% elif "Consultar espacio de fabricación" in get_ready_tasks(coleccion.case_id) %}
+                                {% elif "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
-                                        href="{{ url_for('seleccionar_espacio', id_coleccion=coleccion.id) }}">Seleccionar
+                                        href="{{ url_for('collection.seleccionar_espacio', id_coleccion=coleccion.id) }}">Seleccionar
                                         espacio de fabricación</a>
                                 </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reservar espacio de fabricación") and "Elaborar plan de fabricación" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación") %}
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricacion" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación") %}
                                 <td class="col-md-3">
                                     <a class="btn btn-success"
                                         href="{{ url_for('recibir_materiales', id_coleccion=coleccion.id) }}">Marcar
