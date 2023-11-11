@@ -53,7 +53,7 @@ def eliminar_tarea(id_coleccion, id_tarea):
         "collection/planificar_fabricacion.html", coleccion=Coleccion.get_by_id(id_coleccion), tareas=tareas, form=form
     )
 
-@bp.route('/<int:id_coleccion>/<int:id_tarea>/finalizar', methods=['GET'])
+@bp.route('/<int:id_coleccion>/<int:id_tarea>/finalizar', methods=['GET','POST'])
 @login_required
 def finalizar_tarea(id_coleccion, id_tarea):
     if session["current_rol"] != "Operaciones":
@@ -65,8 +65,9 @@ def finalizar_tarea(id_coleccion, id_tarea):
 
     if Tarea.coleccion_finalizada(id_coleccion):
         coleccion = Coleccion.get_by_id(id_coleccion)
-        set_bonita_variable(coleccion.case_id, "tareas_terminadas", "true", "java.lang.Boolean")
-        set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
+        set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
+        #Hay que ver si es necesario poner esta variable en True en este momento
+        #set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
         flash("Tareas finalizadas", "success")
         return redirect(url_for("home"))
     else:

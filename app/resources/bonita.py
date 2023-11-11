@@ -187,3 +187,27 @@ def get_completed_tasks_by_name(case_id, name):
         tareas = [task["name"] for task in response.json()]
     print(tareas)
     return tareas
+
+def deleteCase(case_id):
+    requestSession = requests.Session()
+    URL = "http://localhost:8080/bonita/API/bpm/case/" + str(case_id)
+    headers = getBonitaHeaders()
+    response = requestSession.delete(URL, headers=headers)
+    print(response.status_code)
+
+def get_bonita_variable(case_id, variable_name):
+    """setea un valor a la variable que es pasada por parametro"""
+    requestSession = requests.Session()
+    URL = (
+        "http://localhost:8080/bonita/API/bpm/caseVariable/"
+        + str(case_id)
+        + "/"
+        + variable_name
+    )
+    headers = getBonitaHeaders()
+    response = requestSession.get(URL, headers=headers)
+    print("Response de get variable bonita para la variable "+variable_name+":")
+    print(response)
+    print("Valor de la variable "+variable_name+":")
+    print(response.json()["value"])
+    return response.json()["value"]
