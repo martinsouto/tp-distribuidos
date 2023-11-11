@@ -312,3 +312,19 @@ def seleccionar_espacio(id_coleccion):
             return redirect(url_for("home"))
     flash("No tienes permiso para acceder a este sitio", "error")
     return redirect(url_for("home"))
+
+@login_required
+@bp.route('/<int:id_coleccion>/recibir_materiales', methods=['GET', 'POST'])
+def recibir_materiales(id_coleccion):
+    if session["current_rol"] == "Operaciones":
+        # Seteo la variable de bonita materiales_disponibles
+        set_bonita_variable(
+            Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
+        )
+        flash("Materiales recibidos!", "success")
+    else:
+        flash("No tienes permiso para acceder a este sitio", "error")
+    # Espero a que avance a la siguiente tarea antes de redirigir al home, para mostrar bien los botones
+    while ("Elaborar plan de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+        print("Cargando...")
+    return redirect(url_for("home"))

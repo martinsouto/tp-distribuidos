@@ -61,7 +61,7 @@ def create_app():
     def home():
         return render_template("home.html")
     
-    from app.resources import collection, auth, reserve, type
+    from app.resources import collection, auth, reserve, type, tarea
     from app.resources.model import model
     
     app.register_blueprint(collection.bp)

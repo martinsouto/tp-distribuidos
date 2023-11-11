@@ -154,10 +154,10 @@
                                 {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricacion" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación") %}
                                 <td class="col-md-3">
                                     <a class="btn btn-success"
-                                        href="{{ url_for('recibir_materiales', id_coleccion=coleccion.id) }}">Marcar
+                                        href="{{ url_for('collection.recibir_materiales', id_coleccion=coleccion.id) }}">Marcar
                                         materiales como recibidos</a>
                                 </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reservar espacio de fabricación") %}
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") %}
                                 <td class="col-md-3">
                                     <h6 style="color: green;">Materiales recibidos!</h6>  
                                 </td>
@@ -167,10 +167,10 @@
                                 {% endif %}
 
                                 {% if session["current_rol"] == "Operaciones" %}
-                                {% if "Elaborar plan de fabricación" in get_ready_tasks(coleccion.case_id) %}
+                                {% if "Elaborar plan de fabricacion" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
-                                        href="{{ url_for('planificar_fabricacion', id_coleccion=coleccion.id) }}">Elaborar
+                                        href="{{ url_for('collection.planificar_fabricacion', id_coleccion=coleccion.id) }}">Elaborar
                                         plan de fabricación</a>
                                 </td>
                                 {% elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación")
