@@ -69,7 +69,7 @@ def finalizar_tarea(id_coleccion, id_tarea):
         #Hay que ver si es necesario poner esta variable en True en este momento
         #set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
         flash("Tareas finalizadas", "success")
-        return redirect(url_for("home"))
+        #return redirect(url_for("home"))
     else:
         flash("Tarea finalizada", "success")
 

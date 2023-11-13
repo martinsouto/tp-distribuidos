@@ -39,6 +39,10 @@ def seleccion_materiales(id_coleccion):
         mats_obtenidos = [material["name"] for material in listado]
         # filtramos stocks para utilizarlos mas adelante
         stocks = [material["stock"] for material in listado]
+        # filtramos delivery_time para utilizarlos mas adelante
+        delivery_time = [material["delivery_time"] for material in listado]
+        print("DELIVERY TIMEEEEEE", delivery_time)
+        print("MATERIALES OBTENIDOS", mats_obtenidos)
         if not (set(materiales) == set(mats_obtenidos)):
             materiales_faltan = [i for i in materiales if i not in mats_obtenidos]
             flash(
@@ -55,6 +59,7 @@ def seleccion_materiales(id_coleccion):
             stocks=stocks,
             id_coleccion=id_coleccion,
             fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
+            delivery_time=delivery_time,
         )
     flash("Algo falló", "error")
     return render_template(
@@ -121,12 +126,27 @@ def guardar_materiales(id_coleccion):
             request.form.getlist("stocks[]")[0]
         )  # uso eval para volverlo dict
         cantidades = request.form.getlist("cantidad[]")
+        delivery_time= eval(
+            request.form.getlist("delivery_time[]")[0]
+        ) # uso eval para volverlo dict
+        print("delivery time", delivery_time)
         print(stocks)
+        #print(delivery_time)
         listado = []
         for i in range(len(materiales)):
             if cantidades[i] != "0":
                 if int(cantidades[i]) > stocks[i]:
                     flash("Stock insuficiente", "error")
+                    return render_template(
+                        "collection/guardar_materiales.html",
+                        materiales=materiales,
+                        stocks=stocks,
+                        id_coleccion=id_coleccion,
+                        fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
+                    )
+                #chequear que delivery time sea menor a la fecha de entrega menos la fecha actual
+                if int(delivery_time[i]) > (Coleccion.get_by_id(id_coleccion).fecha_entrega - datetime.now()).days:
+                    flash("Tiempo de entrega insuficiente", "error")
                     return render_template(
                         "collection/guardar_materiales.html",
                         materiales=materiales,
@@ -176,7 +196,7 @@ def recibir_materiales(id_coleccion):
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
     # Espero a que avance a la siguiente tarea antes de redirigir al home, para mostrar bien los botones
-    while ("Elaborar plan de fabricación" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+    while ("Elaborar plan de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
         print("Cargando...")
     return redirect(url_for("home"))
 

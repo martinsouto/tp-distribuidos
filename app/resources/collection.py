@@ -109,7 +109,12 @@ def elaborar_plan(id_coleccion):
         flash("Planificación creada!", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
-    return redirect(url_for("home"))
+    #return redirect(url_for("home"))
+    coleccion = Coleccion.get_by_id(id_coleccion)
+    tareas = Tarea.get_by_coleccion_id(id_coleccion)
+    return render_template(
+            "collection/administrar_tareas.html", coleccion=coleccion, tareas=tareas
+        )
 
 @bp.route('/<int:id_coleccion>/administrar_tareas', methods=['GET'])
 @login_required

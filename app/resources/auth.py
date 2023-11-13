@@ -40,10 +40,7 @@ def login():
     password = request.form['password']
     #remember = True if request.form.get("remember") else False
     user: User = User.find_by_username(username)
-    print(user)
-    # Chequeamos si existe el usuario
-    # Chequeamos si la contraseña corresponde con la hasheada
-    #falta agregar esta condicion al IF: or user.password != password
+    print("Usuario logeado: ",user)
     if not user:
         flash("El usuario y/o la contraseña son incorrectos.")
         return render_template('auth/login.html')

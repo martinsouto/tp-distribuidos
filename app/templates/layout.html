@@ -53,7 +53,8 @@
                         {% if current_user.is_authenticated %}
                         <a type="button" class="btn btn-secondary-item" href="/auth/logout">Cerrar sesión</a>
                         {% else %}
-                        <a type="button" class="btn btn-secondary-item" href="{{ url_for('login') }}">Iniciar sesión</a>
+                        <a type="button" class="btn btn-secondary-item" href="{{ url_for('auth.register') }}">Registrarse</a>
+                        <a type="button" class="btn btn-secondary-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
                         {% endif %}
                     </span>
                 </div>
