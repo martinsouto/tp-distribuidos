@@ -35,48 +35,51 @@
                         <div class="form-group">
                             <div class="form-group row justify-content-center">
                                 <div class="col-md-10">
-
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <div class="col">
-                                                    <td class="col align-self-center">
-                                                        Nombre
-                                                    </td>
-                                                </div>
-                                                <div class="col">
-                                                    <td class="col align-self-center">
-                                                        Incluir
-                                                    </td>
-                                                </div>
-                                            </tr>
-                                            {% for material in materiales %}
-                                            <tr>
-                                                <div class="col">
-                                                    <td class="col align-self-center">
-                                                        {{material.name}}
-                                                    </td>
-                                                </div>
-                                                <div class="col">
-                                                    <td class="col align-self-center">
-                                                        <input type="checkbox" id="{{material.name}}"
-                                                            name="materiales[]" value="{{material.name}}" data-on="Si"
-                                                            data-off="No" data-toggle="toggle" data-size="sm">
-                                                    </td>
-                                                </div>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    <label for="fecha_entrega">Fecha recepción de materiales:</label>
+                                    <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-control">
                                 </div>
                             </div>
 
-                            <div class="form-group row justify-content-center">
-                                <div class="col-md-10">
-                                    <button type="submit" class="btn btn-primary">Cargar</button>
-                                    <button type="reset" class="btn btn-primary">Limpiar</button>
-                                </div>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <div class="col">
+                                            <td class="col align-self-center">
+                                                Nombre
+                                            </td>
+                                        </div>
+                                        <div class="col">
+                                            <td class="col align-self-center">
+                                                Incluir
+                                            </td>
+                                        </div>
+                                    </tr>
+                                    {% for material in materiales %}
+                                    <tr>
+                                        <div class="col">
+                                            <td class="col align-self-center">
+                                                {{material.name}}
+                                            </td>
+                                        </div>
+                                        <div class="col">
+                                            <td class="col align-self-center">
+                                                <input type="checkbox" id="{{material.name}}"
+                                                    name="materiales[]" value="{{material.name}}" data-on="Si"
+                                                    data-off="No" data-toggle="toggle" data-size="sm">
+                                            </td>
+                                        </div>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group row justify-content-center">
+                            <div class="col-md-10">
+                                <button type="submit" class="btn btn-primary">Cargar</button>
+                                <button type="reset" class="btn btn-primary">Limpiar</button>
                             </div>
+                        </div>
                     </form>
                 </div>
             </div>

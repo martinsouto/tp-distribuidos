@@ -36,7 +36,7 @@
                             <div class="form-group row justify-content-center">
                                 <div class="col-md-10">
                                     <div class="card">
-                                        <div class="card-header">Materiales a incluir <a href="#" class="badge badge-pill badge-primary">Fecha de entrega: {{fecha_entrega.strftime('%d-%m-%Y')}}</a></div>
+                                        <div class="card-header">Materiales a incluir <a href="#" class="badge badge-pill badge-primary">Fecha de recepción: {{fecha_entrega}}</a></div>
                                         <div class="card-body">
                                             <table class="table">
                                                 <tbody>
@@ -99,6 +99,7 @@
                                                     <input type="hidden" name="materiales[]" value="{{materiales}}">
                                                     <input type="hidden" name="stocks[]" value="{{stocks}}">
                                                     <input type="hidden" name="delivery_time[]" value="{{delivery_time}}">
+                                                    <input type="hidden" name="fecha_entrega" value="{{fecha_entrega}}">
                                                 </tbody>
                                             </table>
                                         </div>

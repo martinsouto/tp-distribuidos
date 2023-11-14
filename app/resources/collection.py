@@ -14,7 +14,6 @@ from app.resources.auth import login_required
 from app.resources.bonita import *
 from app.models.coleccion_sede import Coleccion_sede
 from datetime import timedelta
-
 from app.models.model import Modelo
 
 
@@ -47,13 +46,13 @@ def crear():
             # Se finaliza la tarea
             updateUserTask(taskId, "completed")
             # Si todo salió bien se crea la colección
-            # resto un mes para setear fecha entrega y mando vacio para los modelos
+            # resto 10 días para setear fecha entrega y mando vacio para los modelos
             Coleccion.crear(
                 case_id,
                 nombre,
                 form.cantidad_muebles.data,
                 fecha_lanzamiento,
-                fecha_lanzamiento - datetime.timedelta(30),
+                fecha_lanzamiento - datetime.timedelta(10),
                 [1],
                 modelos,
             )
@@ -79,6 +78,7 @@ def crear():
 @bp.route('/<int:id_coleccion>/planificar', methods=['GET'])
 @login_required
 def planificar_fabricacion(id_coleccion):
+    """Planificación de la fabricación de una coleccion"""
     form = FormAltaTarea()
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
@@ -96,6 +96,7 @@ def planificar_fabricacion(id_coleccion):
 @bp.route('/<int:id_coleccion>/elaborar_plan', methods=['GET', 'POST'])
 @login_required
 def elaborar_plan(id_coleccion):
+    """Elaboración del plan de fabricación de una coleccion"""
     if session["current_rol"] == "Operaciones":
         tareas = Coleccion.get_by_id(id_coleccion).tareas
         print(tareas)
@@ -119,6 +120,7 @@ def elaborar_plan(id_coleccion):
 @bp.route('/<int:id_coleccion>/administrar_tareas', methods=['GET'])
 @login_required
 def administrar_tareas(id_coleccion):
+    """Administración de las tareas de una coleccion"""
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
         tareas = Tarea.get_by_coleccion_id(id_coleccion)
@@ -132,6 +134,7 @@ def administrar_tareas(id_coleccion):
 @bp.route('/<int:id_coleccion>/eliminar_coleccion', methods=['GET', 'DELETE'])
 @login_required
 def eliminar_coleccion(id_coleccion):
+    """Eliminación de una coleccion"""
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
         deleteCase(coleccion.case_id)
@@ -147,6 +150,7 @@ def eliminar_coleccion(id_coleccion):
 @bp.route('/<int:id_coleccion>/nueva_distribucion', methods=['GET'])
 @login_required
 def nueva_distribucion(id_coleccion):
+    """Planificación de la distribución de una coleccion"""
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
         sedes = Sede.sedes()
@@ -162,6 +166,7 @@ def nueva_distribucion(id_coleccion):
 @bp.route('/<int:id_coleccion>/planificar_distribucion', methods=['GET','POST'])
 @login_required
 def planificar_distribucion(id_coleccion):
+    """Planificación de la distribución de una coleccion"""
     if session["current_rol"] == "Operaciones":
         cantidades = request.form.getlist("cantidades[]")
         coleccion = Coleccion.get_by_id(id_coleccion)
@@ -180,7 +185,12 @@ def planificar_distribucion(id_coleccion):
                 if int(c) > 0:
                     Coleccion_sede.crear(id_coleccion, index + 1, c, False)
             flash("La distribución se planificó con éxito", "success")
-            return redirect(url_for("home"))
+            lotes = Coleccion_sede.get_by_id_coleccion(id_coleccion)
+            return render_template(
+                "collection/ver_lotes.html",
+                coleccion=coleccion,
+                lotes=lotes,
+                )
         else:
             sedes = Sede.sedes()
             flash(
@@ -199,6 +209,7 @@ def planificar_distribucion(id_coleccion):
 @bp.route('/<int:id_coleccion>/ver_lotes', methods=['GET'])
 @login_required
 def ver_lotes(id_coleccion):
+    """Visualización de los lotes de una coleccion"""
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
         lotes = Coleccion_sede.get_by_id_coleccion(id_coleccion)
@@ -214,6 +225,7 @@ def ver_lotes(id_coleccion):
 @bp.route('/<int:id_lote>/enviar_lote', methods=['GET','POST'])
 @login_required
 def enviar_lote(id_lote):
+    """Envío de un lote de una coleccion"""
     lote = Coleccion_sede.get_by_id(id_lote)
     coleccion = Coleccion.get_by_id(lote.id_coleccion)
     if session["current_rol"] == "Operaciones":
@@ -242,6 +254,7 @@ def enviar_lote(id_lote):
 @bp.route('/<int:id_coleccion>/reprogramar', methods=['POST'])
 @login_required
 def reprogramar(id_coleccion):
+    """Reprogramación de una coleccion"""
     if session["current_rol"] == "Operaciones":
         form = FormReprogramarColeccion()
         coleccion = Coleccion.get_by_id(id_coleccion)
@@ -256,6 +269,7 @@ def reprogramar(id_coleccion):
 @bp.route('/<int:id_coleccion>/modificar_fecha', methods=['POST'])
 @login_required
 def modificar_fecha(id_coleccion):
+    """Modificación de la fecha de lanzamiento de una coleccion"""
     if session["current_rol"] == "Operaciones":
         form = FormReprogramarColeccion()
         coleccion = Coleccion.get_by_id(id_coleccion)

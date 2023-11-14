@@ -40,7 +40,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th class="col-md-3">
-                                    Nombre
+                                    Nombre colección
                                 </th>
                                 <th class="col-md-3">
                                     Cantidad de muebles
@@ -173,7 +173,7 @@
                                         href="{{ url_for('collection.planificar_fabricacion', id_coleccion=coleccion.id) }}">Elaborar
                                         plan de fabricación</a>
                                 </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion")
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Planificar fabricacion")
                                 %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
@@ -190,7 +190,7 @@
                                 {% if "Iniciar planificacion de distribucion" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
-                                        href="{{ url_for('collection.nueva_distribucion', id_coleccion=coleccion.id) }}">Planificar</a>
+                                        href="{{ url_for('collection.nueva_distribucion', id_coleccion=coleccion.id) }}">Planificar Distribucion</a>
                                 </td>
                                 {% elif "Asociar lotes con las ordenes de distribucion" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">

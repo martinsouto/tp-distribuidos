@@ -47,6 +47,7 @@ class Coleccion(db.Model, UserMixin):
     tareas = db.relationship("Tarea", backref="coleccion", uselist=True)
     inicio_fabricacion = db.Column(db.DateTime, nullable=True)
     fin_fabricacion = db.Column(db.DateTime, nullable=True)
+    fecha_recepcion_materiales = db.Column(db.DateTime, nullable=True)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(
         db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now()
@@ -159,4 +160,9 @@ class Coleccion(db.Model, UserMixin):
         coleccion = Coleccion.get_by_id(id_coleccion)
         print(coleccion)
         db.session.delete(coleccion)
+        db.session.commit()
+
+    def modificar_entrega_materiales(self, nueva_fecha):
+        """Modifica la fecha de entrega de materiales de la coleccion"""
+        self.fecha_recepcion_materiales = nueva_fecha
         db.session.commit()

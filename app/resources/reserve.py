@@ -33,6 +33,9 @@ def seleccion_materiales(id_coleccion):
     if session["current_rol"] == "Operaciones":
         """Template Seleccionar materiales"""
         materiales = request.form.getlist("materiales[]")
+        #obtengo la fecha de entrega seleccionada
+        fecha_entrega = request.form.get("fecha_entrega")
+        print("LA FECHA DE ENTREGA SELECCIONADA ES: ", fecha_entrega)
         token = login_api_materiales()
         listado = listado_api_materiales(token, materiales)
         # filtramos materiales obtenidos
@@ -58,7 +61,7 @@ def seleccion_materiales(id_coleccion):
             materiales=listado,
             stocks=stocks,
             id_coleccion=id_coleccion,
-            fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
+            fecha_entrega=fecha_entrega,
             delivery_time=delivery_time,
         )
     flash("Algo falló", "error")
@@ -129,6 +132,12 @@ def guardar_materiales(id_coleccion):
         delivery_time= eval(
             request.form.getlist("delivery_time[]")[0]
         ) # uso eval para volverlo dict
+        #recibo la fecha de entrega
+        fecha_entrega = request.form.get("fecha_entrega")
+        #paso de cadena a datetime
+        fecha_entrega_as_datetime = datetime.strptime(fecha_entrega, '%Y-%m-%d')
+        #guardo la fecha de entrega de materiales en la coleccion
+        Coleccion.get_by_id(id_coleccion).modificar_entrega_materiales(fecha_entrega_as_datetime)
         print("delivery time", delivery_time)
         print(stocks)
         #print(delivery_time)
@@ -142,17 +151,17 @@ def guardar_materiales(id_coleccion):
                         materiales=materiales,
                         stocks=stocks,
                         id_coleccion=id_coleccion,
-                        fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
+                        fecha_entrega=fecha_entrega
                     )
                 #chequear que delivery time sea menor a la fecha de entrega menos la fecha actual
-                if int(delivery_time[i]) > (Coleccion.get_by_id(id_coleccion).fecha_entrega - datetime.now()).days:
+                if int(delivery_time[i]) > (fecha_entrega_as_datetime - datetime.now()).days:
                     flash("Tiempo de entrega insuficiente", "error")
                     return render_template(
                         "collection/guardar_materiales.html",
                         materiales=materiales,
                         stocks=stocks,
                         id_coleccion=id_coleccion,
-                        fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
+                        fecha_entrega=fecha_entrega,
                     )
                 else:
                     listado.append(
@@ -325,7 +334,7 @@ def seleccionar_espacio(id_coleccion):
                 espacios=espacios,
                 id_coleccion=id_coleccion,
                 fecha_entrega=Coleccion.get_by_id(id_coleccion).fecha_entrega,
-                fecha_actual=datetime.now()
+                fecha_recepcion_materiales=Coleccion.get_by_id(id_coleccion).fecha_recepcion_materiales,
             )
         else:
             flash("No hay espacios disponibles", "error")
