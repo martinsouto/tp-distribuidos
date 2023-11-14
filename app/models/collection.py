@@ -62,7 +62,7 @@ class Coleccion(db.Model, UserMixin):
         lazy="subquery",
         backref=db.backref("colecciones", lazy=True),
     )
-
+    
     coleccion_tiene_usuario = db.relationship(
         "User",
         secondary=coleccion_tiene_usuario,
@@ -117,9 +117,11 @@ class Coleccion(db.Model, UserMixin):
         db.session.commit()
 
     def get_by_name(name):
+        """Devuelve una coleccion por su nombre"""
         return Coleccion.query.filter_by(name=name).first()
 
     def get_by_id(id):
+        """Devuelve una coleccion por su id"""
         return Coleccion.query.filter_by(id=id).first()
 
     def save_materials(self, materiales):
@@ -149,26 +151,8 @@ class Coleccion(db.Model, UserMixin):
         db.session.commit()
 
     def get_all_colections():
+        """Devuelve todas las colecciones"""
         return Coleccion.query.all()
-
-    def get_most_used_model():
-        query = db.engine.execute(
-            text(
-                "SELECT modelo_id, COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
-            )
-        )
-        modelo_id = [row[0] for row in query][0]
-        modelo = Modelo.get_by_id(modelo_id)
-        return modelo
-
-    def get_cant_most_used_model():
-        query = db.engine.execute(
-            text(
-                "SELECT COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
-            )
-        )
-        cant = [row[0] for row in query][0]
-        return cant
 
     def eliminar(id_coleccion):
         """elimina la coleccion"""

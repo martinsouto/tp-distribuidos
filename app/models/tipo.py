@@ -32,4 +32,5 @@ class Tipo(db.Model, UserMixin):
         return Tipo.query.all()
 
     def get_by_name(name):
+        """Devuelve un tipo por su nombre"""
         return Tipo.query.filter_by(name=name).first()

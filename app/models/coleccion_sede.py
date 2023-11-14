@@ -36,30 +36,32 @@ class Coleccion_sede(db.Model, UserMixin):
         db.session.commit()
 
     def get_by_id_coleccion(id_coleccion):
+        """Devuelve todas las sedes de una colección"""
         return Coleccion_sede.query.filter_by(id_coleccion=id_coleccion).all()
 
     def get_by_id(id):
+        """Devuelve una entrega por su id"""
         return Coleccion_sede.query.filter_by(id=id).first()
 
     def estado(self):
+        """Devuelve el estado de la entrega"""
         if self.entregado:
             return "Enviado"
         else:
             return "Pendiente de envío"
 
     def enviar(self):
+        """Envía la entrega"""
         self.entregado = True
         db.session.commit()
 
     def lotes_enviados(id_coleccion):
-        lotes = Coleccion_sede.query.filter_by(
-            id_coleccion=id_coleccion, entregado=False
-        ).all()
-        print("LOTES ENVIADOS!!")
-        print(lotes)
+        """Devuelve True si todos los lotes de una colección fueron enviados"""
+        lotes = Coleccion_sede.query.filter_by(id_coleccion=id_coleccion, entregado=False).all()
         return len(lotes) == 0
 
     def eliminar(id_coleccion):
+        """Elimina todas las entregas de una colección"""
         lista = Coleccion_sede.query.filter_by(id_coleccion=id_coleccion).all()
         for l in lista:
             db.session.delete(l)

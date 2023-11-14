@@ -37,7 +37,9 @@ class Modelo(db.Model, UserMixin):
         return Modelo.query.all()
 
     def get_by_name(name):
+        """Devuelve un modelo por su nombre"""
         return Modelo.query.filter_by(name=name).first()
 
     def get_by_id(id):
+        """Devuelve un modelo por su id"""
         return Modelo.query.filter_by(id=id).first()

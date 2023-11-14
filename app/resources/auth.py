@@ -10,21 +10,22 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=['POST','GET'])
 def register():
+    """Registra un usuario en la base de datos"""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         error = None
         if not username:
-            error = 'Username is required'
+            error = 'El nombre de usuario es requerido'
         elif not password:
-            error = 'Password is required'
+            error = 'La contraseña es requerida'
         elif User.find_by_username(username) is not None:
-            error = "User {} already exists, try a different username".format(username)
+            error = "El usuario {} ya existe".format(username)
         else:
             session.clear()
             response = loginBonita(username, password)
             if response.status_code != 204:
-                error = "User {} not found in Bonita's user pool".format(username)
+                error = "El usuario {} no existe en la organización".format(username)
             else:
                 user = User(username=username, password=generate_password_hash(password))
                 User.create(user)
@@ -35,6 +36,7 @@ def register():
 
 @bp.route('/login', methods=['POST','GET'])
 def login():
+  """Logea un usuario en la aplicación"""
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']
@@ -44,14 +46,12 @@ def login():
     if not user:
         flash("El usuario y/o la contraseña son incorrectos.")
         return render_template('auth/login.html')
-        # if user doesn't exist or password is wrong, reload the page
 
     # chequeamos si el usuario existe en la organización de bonita
     response = loginBonita(user.username, password)
     if response.status_code != 204:
         flash("El usuario no forma parte de la organización.")
         return render_template('auth/login.html')
-    # if the above check passes, then we know the user has the right credentials
     login_user(user)
     session["current_rol"] = getUserMembership()
     return redirect(url_for('home'))
@@ -60,7 +60,7 @@ def login():
 @login_required
 @bp.route('/logout', methods=['POST','GET'])
 def logout():
-    # logout de bonita
+    """Deslogea un usuario de la aplicación"""
     logoutBonita()
     logout_user()
     return redirect('login')

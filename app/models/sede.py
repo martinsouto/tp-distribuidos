@@ -32,7 +32,9 @@ class Sede(db.Model, UserMixin):
         return Sede.query.all()
 
     def get_by_name(name):
+        """Devuelve una sede por su nombre"""
         return Sede.query.filter_by(name=name).first()
 
     def get_by_id(id):
+        """Devuelve una sede por su id"""
         return Sede.query.filter_by(id=id).first()

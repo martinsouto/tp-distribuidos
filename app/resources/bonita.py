@@ -9,8 +9,7 @@ def loginBonita(username, password):
     headers = {"Content-type": "application/x-www-form-urlencoded"}
     requestSession = requests.Session()
     response = requestSession.post(URL, data=body, headers=headers)
-    print("Response del login:")
-    print(response)
+    print("Response del login:", response)
     # si todo sale bien seteo las variables de sesión
     if response.status_code == 204:
         session["JSESSION"] = "JSESSIONID=" + response.cookies.get("JSESSIONID")
@@ -21,59 +20,39 @@ def loginBonita(username, password):
     return response
 
 def logoutBonita():
+    """Se deslogea de bonita"""
     requestSession = requests.Session()
     URL = "http://localhost:8080/bonita/logoutservice"
-    headers = {
-        "Cookie": session["JSESSION"],
-        "X-Bonita-API-Token": session["bonita_token"],
-    }
+    headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
-    print("Response de logout Bonita:")
-    print(response)
+    print("Response de logout Bonita:", response)
 
 def init_process():
-    # Se le pega a la API y se recupera el id del proceso
+    """Se inicia el proceso de bonita"""
+    # Se recupera el ID del proceso
     requestSession = requests.Session()
     URL = "http://localhost:8080/bonita/API/bpm/process?s=Creación de colección"
-    print(URL)
     headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
     processId = response.json()[0]["id"]
-    print("Response del init_process:")
-    print(response)
-    print("Process ID: " + response.json()[0]["id"])
     # Se instancia el proceso con su id, creando una tarea
     URL = "http://localhost:8080/bonita/API/bpm/process/" + processId + "/instantiation"
-    headers = getBonitaHeaders()
     response = requestSession.post(URL, headers=headers)
-    print("Response al instanciar proceso:")
-    print(response)
     case_id = response.json()["caseId"]
-    print("Case ID:")
-    print(case_id)
+    print("Case ID:", case_id)
     return case_id
 
 def set_bonita_variable(case_id, variable_name, variable_value, type):
+    """Se setea una variable en el proceso"""
     requestSession = requests.Session()
-    URL = (
-        "http://localhost:8080/bonita/API/bpm/caseVariable/"
-        + str(case_id)
-        + "/"
-        + variable_name
-    )
+    URL = ("http://localhost:8080/bonita/API/bpm/caseVariable/"+ str(case_id)+ "/"+ variable_name)
     body = {"value": variable_value, "type": type}
     headers = getBonitaHeaders()
     data = json.dumps(body)
     response = requestSession.put(URL, headers=headers, data=data)
-    print("Response de setear variable bonita:")
-    print(response)
-    response = requestSession.get(URL, headers=headers)
-    print("Response al hacer get de variable bonita:")
-    print(response)
-    print("Valor de la variable coleccion_id:")
-    #print(response.json()["value"])
 
 def getBonitaHeaders():
+    """Se obtienen las cookies de bonita"""
     headers = {
         "Cookie": session["JSESSION"],
         "X-Bonita-API-Token": session["bonita_token"],
@@ -95,9 +74,6 @@ def get_user_id():
     URL = "http://localhost:8080/bonita/API/system/session/unusedId"
     headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
-    print("Response del get user id:")
-    print(response)
-    print(response.json()["user_id"])
     user_id = response.json()["user_id"]
     return user_id
 
@@ -112,72 +88,56 @@ def assign_task(taskId):
     # Lo convierto a json porque sino tira 500
     data = json.dumps(body)
     response = requestSession.put(URL, headers=headers, data=data)
-    print(response)
 
 def updateUserTask(taskId, state):
+    """Se actualiza el estado de la tarea de usuario"""
     requestSession = requests.Session()
     URL = "http://localhost:8080/bonita/API/bpm/humanTask/" + taskId
     headers = getBonitaHeaders()
     body = {"state": state}
+    # Lo convierto a json porque sino tira 500
     data = json.dumps(body)
     response = requestSession.put(URL, headers=headers, data=data)
-    print("Print del update user task:")
-    print(response)
 
 def getUserMembership():
-    print("ENTRE A GET USER MEMBER SHIP")
+    """Se obtiene el rol del usuario logeado"""
     requestSession = requests.Session()
     user = getLoggedUser()
     params = {"f": "user_id=" + user["id"], "d": "role_id"}
-    headers = {
-        "Cookie": session["JSESSION"],
-        "X-Bonita-API-Token": session["bonita_token"],
-    }
+    headers = getBonitaHeaders()
     URL = "http://localhost:8080/bonita/API/identity/membership"
     response = requestSession.get(URL, headers=headers, params=params)
-    print("Response de getUserMemebership:")
-    print(response)
-    print("rol:")
-    print(response.json()[0]["role_id"]["name"])
     return response.json()[0]["role_id"]["name"]
 
 def getLoggedUser():
+    """Se obtiene el usuario logeado"""
     requestSession = requests.Session()
-    headers = {
-        "Cookie": session["JSESSION"],
-        "X-Bonita-API-Token": session["bonita_token"],
-    }
+    headers = getBonitaHeaders()
     URL = "http://localhost:8080/bonita/API/system/session/unusedid"
     response = requestSession.get(URL, headers=headers)
-    print("Response de getLoggedUser:")
-    print(response)
-    print("username: " + response.json()["user_name"])
     return {
         "id": response.json()["user_id"],
         "username": response.json()["user_name"],
     }
 
 def get_ready_tasks(case_id):
+    """Se obtienen las tareas listas para ser realizadas"""
     requestSession = requests.Session()
-    URL = (
-        "http://localhost:8080/bonita/API/bpm/humanTask/"
-    )
+    URL = ("http://localhost:8080/bonita/API/bpm/humanTask/")
     headers = getBonitaHeaders()
     params = {"f": "caseId="+str(case_id)}
     response = requestSession.get(URL, headers=headers, params=params)
     print("Response del get tareas ready para el case "+str(case_id)+":")
     tareas = []
-    print(response.status_code)
     if response.status_code == 200:
         tareas = [task["name"] for task in response.json()]
     print(tareas)
     return tareas
 
 def get_completed_tasks_by_name(case_id, name):
+    """Se obtienen las tareas completadas por nombre"""
     requestSession = requests.Session()
-    URL = (
-        "http://localhost:8080/bonita/API/bpm/archivedHumanTask?f=caseId="+str(case_id)+"&f=name="+name
-    )
+    URL = ("http://localhost:8080/bonita/API/bpm/archivedHumanTask?f=caseId="+str(case_id)+"&f=name="+name)
     headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
     print("Response del get tareas completed para el case "+str(case_id)+":")
@@ -189,25 +149,16 @@ def get_completed_tasks_by_name(case_id, name):
     return tareas
 
 def deleteCase(case_id):
+    """Se elimina el case"""
     requestSession = requests.Session()
     URL = "http://localhost:8080/bonita/API/bpm/case/" + str(case_id)
     headers = getBonitaHeaders()
     response = requestSession.delete(URL, headers=headers)
-    print(response.status_code)
 
 def get_bonita_variable(case_id, variable_name):
-    """setea un valor a la variable que es pasada por parametro"""
+    """Se obtiene una variable del proceso"""
     requestSession = requests.Session()
-    URL = (
-        "http://localhost:8080/bonita/API/bpm/caseVariable/"
-        + str(case_id)
-        + "/"
-        + variable_name
-    )
+    URL = ("http://localhost:8080/bonita/API/bpm/caseVariable/"+ str(case_id)+ "/"+ variable_name)
     headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
-    print("Response de get variable bonita para la variable "+variable_name+":")
-    print(response)
-    print("Valor de la variable "+variable_name+":")
-    print(response.json()["value"])
     return response.json()["value"]

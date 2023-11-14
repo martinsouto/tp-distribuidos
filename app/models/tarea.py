@@ -52,26 +52,28 @@ class Tarea(db.Model, UserMixin):
         return Tarea.query.all()
 
     def get_by_name(nombre):
+        """Devuelve un tarea por su nombre"""
         return Tarea.query.filter_by(nombre=nombre).first()
 
     def get_by_name_and_coleccion(nombre, coleccion_id):
+        """Devuelve un tarea por su nombre y coleccion_id"""
         return Tarea.query.filter_by(nombre=nombre, coleccion_id=coleccion_id).first()
 
     def get_by_id(id):
+        """Devuelve un tarea por su id"""
         return Tarea.query.filter_by(id=id).first()
 
     def get_by_coleccion_id(coleccion_id):
+        """Devuelve un tarea por su coleccion_id"""
         return Tarea.query.filter_by(coleccion_id=coleccion_id).all()
 
     def coleccion_finalizada(id_coleccion):
-        tareas = Tarea.query.filter_by(
-            coleccion_id=id_coleccion, finalizada=False
-        ).all()
-        print("TAREAS FINALIZADAS!!")
-        print(tareas)
+        """Devuelve True si todas las tareas de una coleccion estan finalizadas"""
+        tareas = Tarea.query.filter_by(coleccion_id=id_coleccion, finalizada=False).all()
         return len(tareas) == 0
 
     def eliminar_todas(coleccion_id):
+        """Elimina todas las tareas de una coleccion"""
         lista = Tarea.query.filter_by(coleccion_id=coleccion_id).all()
         for l in lista:
             db.session.delete(l)
