@@ -145,36 +145,35 @@ def guardar_materiales(id_coleccion):
         for i in range(len(materiales)):
             if cantidades[i] != "0":
                 if int(cantidades[i]) > stocks[i]:
-                    flash("Stock insuficiente", "error")
-                    return render_template(
-                        "collection/guardar_materiales.html",
-                        materiales=materiales,
-                        stocks=stocks,
-                        id_coleccion=id_coleccion,
-                        fecha_entrega=fecha_entrega
+                    flash("Stock insuficiente, reprogramar", "error")
+                    set_bonita_variable(
+                    Coleccion.get_by_id(id_coleccion).case_id,
+                    "reprogramar_lanzamiento",
+                    "true",
+                    "java.lang.Boolean",
                     )
                 #chequear que delivery time sea menor a la fecha de entrega menos la fecha actual
-                if int(delivery_time[i]) > (fecha_entrega_as_datetime - datetime.now()).days:
-                    flash("Tiempo de entrega insuficiente", "error")
-                    return render_template(
-                        "collection/guardar_materiales.html",
-                        materiales=materiales,
-                        stocks=stocks,
-                        id_coleccion=id_coleccion,
-                        fecha_entrega=fecha_entrega,
+                elif int(delivery_time[i]) > (fecha_entrega_as_datetime - datetime.now()).days:
+                    flash("Tiempo de entrega insuficiente, reprogramar", "error")
+                    set_bonita_variable(
+                    Coleccion.get_by_id(id_coleccion).case_id,
+                    "reprogramar_lanzamiento",
+                    "true",
+                    "java.lang.Boolean",
                     )
                 else:
                     listado.append(
                         {"id": materiales[i]["id"], "quantity": int(cantidades[i])}
                     )
-        print(json.dumps(listado))
-        Coleccion.get_by_id(id_coleccion).save_materials(str(json.dumps(listado)))
-        set_bonita_variable(
-            Coleccion.get_by_id(id_coleccion).case_id,
-            "hay_materiales",
-            "true",
-            "java.lang.Boolean",
-        )
+                    print(json.dumps(listado))
+                    Coleccion.get_by_id(id_coleccion).save_materials(str(json.dumps(listado)))
+                    set_bonita_variable(
+                        Coleccion.get_by_id(id_coleccion).case_id,
+                        "hay_materiales",
+                        "true",
+                        "java.lang.Boolean",
+                    )
+                    flash("Materiales guardados!", "success")
         #Asigno y finalizo tarea de definición de materiales
         taskId = getUserTaskByName(
             "Definir Materiales necesarios", Coleccion.get_by_id(id_coleccion).case_id
@@ -189,7 +188,6 @@ def guardar_materiales(id_coleccion):
         )
         assign_task(taskIdConsultaMateriales)
         updateUserTask(taskIdConsultaMateriales, "completed")
-        flash("Materiales guardados!", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
     return redirect(url_for("home"))
@@ -337,7 +335,17 @@ def seleccionar_espacio(id_coleccion):
                 fecha_recepcion_materiales=Coleccion.get_by_id(id_coleccion).fecha_recepcion_materiales,
             )
         else:
-            flash("No hay espacios disponibles", "error")
+            while ("Consulta de espacio de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+                print("Cargando...")
+            taskId = getUserTaskByName("Consulta de espacio de fabricacion",case_id,)
+            # Seteo la variable de bonita reprogramar_lanzamiento
+            set_bonita_variable(
+            case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean"
+            )
+            assign_task(taskId)
+            # Se finaliza la tarea
+            updateUserTask(taskId, "completed")
+            flash("No hay espacios disponibles, (REPROGRAMAR)", "error")
             return redirect(url_for("home"))
     flash("No tienes permiso para acceder a este sitio", "error")
     return redirect(url_for("home"))
@@ -346,14 +354,28 @@ def seleccionar_espacio(id_coleccion):
 @bp.route('/<int:id_coleccion>/recibir_materiales', methods=['GET', 'POST'])
 def recibir_materiales(id_coleccion):
     if session["current_rol"] == "Operaciones":
-        # Seteo la variable de bonita materiales_disponibles
-        set_bonita_variable(
-            Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
-        )
-        flash("Materiales recibidos!", "success")
+                #chequeo si la fecha actual es mayor a la fecha de recepcion de materiales
+        if datetime.now() > Coleccion.get_by_id(id_coleccion).fecha_recepcion_materiales:
+            # Seteo la variable de bonita materiales_atrasados
+            set_bonita_variable(
+                Coleccion.get_by_id(id_coleccion).case_id, "materiales_atrasados", "true", "java.lang.Boolean"
+            )
+            # Seteo la variable de bonita reprogramar_lanzamiento
+            set_bonita_variable(
+                Coleccion.get_by_id(id_coleccion).case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean"
+            )
+            flash("Materiales recibidos atrasados, (REPROGRAMAR)", "error")
+            set_bonita_variable(
+                Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
+            )
+        else:
+            set_bonita_variable(
+                Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
+            )
+            flash("Materiales recibidos!", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
     # Espero a que avance a la siguiente tarea antes de redirigir al home, para mostrar bien los botones
-    while ("Elaborar plan de fabricacion" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+    while ("Elaborar plan de fabricacion" or "Seleccionar fecha de lanzamiento" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
         print("Cargando...")
     return redirect(url_for("home"))

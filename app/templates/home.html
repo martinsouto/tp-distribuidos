@@ -173,7 +173,7 @@
                                         href="{{ url_for('collection.planificar_fabricacion', id_coleccion=coleccion.id) }}">Elaborar
                                         plan de fabricación</a>
                                 </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Planificar fabricacion")
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion")
                                 %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
@@ -192,7 +192,7 @@
                                     <a class="btn btn-primary"
                                         href="{{ url_for('collection.nueva_distribucion', id_coleccion=coleccion.id) }}">Planificar Distribucion</a>
                                 </td>
-                                {% elif "Asociar lotes con las ordenes de distribucion" in get_ready_tasks(coleccion.case_id) %}
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Iniciar planificacion de distribucion") %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
                                         href="{{ url_for('collection.ver_lotes', id_coleccion=coleccion.id) }}">Ver lotes</a>
@@ -207,28 +207,10 @@
                                 {% endif %}
 
                                 {% if session["current_rol"] == "Operaciones" %}
-                                {% if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id) or "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                {% if get_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento") == "true" %}
                                 <td>
                                     <form method="POST"
                                         action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
-                                        class="formulario-enviar" style="display: inline;">
-                                        <input class="btn btn-danger btn-sm" type="submit"
-                                            value="Reprogramar Colección">
-                                    </form>
-                                </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reservar espacio de fabricación") and "Elaborar plan de fabricación" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación") %}
-                                <td>
-                                    <form method="POST"
-                                        action="{{ url_for('reprogramar_coleccion', id_coleccion=coleccion.id) }}"
-                                        class="formulario-enviar" style="display: inline;">
-                                        <input class="btn btn-danger btn-sm" type="submit"
-                                            value="Reprogramar Colección">
-                                    </form>
-                                </td>
-                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación") and "Asociar lotes con las órdenes de distribución" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Asociar lotes con las órdenes de distribución") %}
-                                <td>
-                                    <form method="POST"
-                                        action="{{ url_for('reprogramar_coleccion', id_coleccion=coleccion.id) }}"
                                         class="formulario-enviar" style="display: inline;">
                                         <input class="btn btn-danger btn-sm" type="submit"
                                             value="Reprogramar Colección">
@@ -244,7 +226,7 @@
                                 <td>
                                     <form method="DELETE"
                                         action="{{ url_for('collection.eliminar_coleccion', id_coleccion=coleccion.id) }}"
-                                        class="formulario-eliminar" style="display: inline;">
+                                        class="formulario-enviar" style="display: inline;">
                                         <input class="btn btn-danger btn-sm" type="submit" value="Eliminar Colección">
                                     </form>
                                 </td>

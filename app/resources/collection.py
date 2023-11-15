@@ -229,19 +229,23 @@ def enviar_lote(id_lote):
     lote = Coleccion_sede.get_by_id(id_lote)
     coleccion = Coleccion.get_by_id(lote.id_coleccion)
     if session["current_rol"] == "Operaciones":
-        lote.enviar()
-        if Coleccion_sede.lotes_enviados(coleccion.id):
-            taskId = getUserTaskByName(
-                "Asociar lotes con las ordenes de distribucion",
-                coleccion.case_id,
-            )
-            assign_task(taskId)
-            # Se finaliza la tarea
-            updateUserTask(taskId, "completed")
-            flash("Lotes enviados!", "success")
-            return redirect(url_for("home"))
+        #obtengo la variable de bonita coleccion_finalizada. Si es true, no se puede enviar
+        if get_bonita_variable(coleccion.case_id, "coleccion_finalizada") != "true":
+            flash("No se puede enviar el lote porque la colección aún no finalizó", "error")
         else:
-            flash("Se realizo el envío con éxito", "success")
+            lote.enviar()
+            if Coleccion_sede.lotes_enviados(coleccion.id):
+                taskId = getUserTaskByName(
+                    "Asociar lotes con las ordenes de distribucion",
+                    coleccion.case_id,
+                )
+                assign_task(taskId)
+                # Se finaliza la tarea
+                updateUserTask(taskId, "completed")
+                flash("Lotes enviados!", "success")
+                return redirect(url_for("home"))
+            else:
+                flash("Se realizo el envío con éxito", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
     lotes = Coleccion_sede.get_by_id_coleccion(lote.id_coleccion)
@@ -274,68 +278,6 @@ def modificar_fecha(id_coleccion):
         form = FormReprogramarColeccion()
         coleccion = Coleccion.get_by_id(id_coleccion)
         if form.validate_on_submit():
-            # Si reprogramo porque no hay materiales
-            if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id):
-                print("REPROGRAMANDO XQ NO HAY MATERIALES")
-                taskId = getUserTaskByName(
-                    "Consulta de Disponibilidad de Materiales",
-                    Coleccion.get_by_id(id_coleccion).case_id,
-                )
-                assign_task(taskId)
-                # Se finaliza la tarea
-                updateUserTask(taskId, "completed")
-                # La variable materiales_fecha es false por lo que se vuelve al inicio
-
-            # Si reprogramo porque no hay espacios
-            elif "Consulta de espacio de fabricacion" in get_ready_tasks(
-                coleccion.case_id
-            ):
-                print("REPROGRAMANDO XQ NO HAY ESPACIOS")
-                taskId = getUserTaskByName(
-                    "Consulta de espacio de fabricacion",
-                    Coleccion.get_by_id(id_coleccion).case_id,
-                )
-                assign_task(taskId)
-                # Se finaliza la tarea
-                updateUserTask(taskId, "completed")
-                # La variable plazos_fabricacion es false por lo que se vuelve al inicio
-
-            # Si reprogramo porque no llegaron los materiales
-            elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricación" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricación"):
-                print("REPROGRAMANDO XQ NO LLEGARON LOS MATERIALES")
-                set_bonita_variable(
-                    Coleccion.get_by_id(id_coleccion).case_id,
-                    "materiales_atrasados",
-                    "true",
-                    "java.lang.Boolean",
-                )
-                # Seteo la variable materiales_atrasados para que se vuelva al inicio
-
-            # Si reprogramo porque no se cumplen los plazos
-            elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion") and "Asociar lotes con las órdenes de distribución" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Asociar lotes con las órdenes de distribución"):
-                print("REPROGRAMANDO XQ NO SE FABRICÓ A TIEMPO")
-                set_bonita_variable(
-                    Coleccion.get_by_id(id_coleccion).case_id,
-                    "reprogramar_lanzamiento",
-                    "true",
-                    "java.lang.Boolean",
-                )
-                # Seteo la variable reprogramación para que se vuelva al inicio
-                Tarea.eliminar_todas(id_coleccion)
-                # Elimino todas las tareas de la colección
-            else:
-                flash("No se puede reprogramar en este momento", "error")
-                return redirect(url_for("home"))
-
-            # Si aun no planifiqué la distribución
-            if "Iniciar planificacion de distribucion" in get_ready_tasks(coleccion.case_id):
-                taskId = getUserTaskByName(
-                    "Iniciar planificacion de distribucion",
-                    Coleccion.get_by_id(id_coleccion).case_id,
-                )
-                assign_task(taskId)
-                # Se finaliza la tarea
-                updateUserTask(taskId, "completed")
             nueva_fecha = form.fecha_lanzamiento.data
             coleccion.modificar_lanzamiento(nueva_fecha)
             while "Seleccionar fecha de lanzamiento" not in get_ready_tasks(
@@ -348,25 +290,11 @@ def modificar_fecha(id_coleccion):
             assign_task(taskId)
             # Se finaliza la tarea
             updateUserTask(taskId, "completed")
-            coleccion.modificar_entrega(coleccion.fecha_lanzamiento - timedelta(30))
-            flash("Colección reprogramada con éxito!", "success")
-            
-            # Si aun no planifiqué la distribución
-            if not get_bonita_variable(coleccion.case_id, "materiales_disponibles"):
-                while "Consulta de Disponibilidad de Materiales" not in get_ready_tasks(
-                    coleccion.case_id
-                ):
-                    print("Cargando CONSULTA MATERIALES...")
-            else:
-                while "Consulta de espacio de fabricacion" not in get_ready_tasks(
-                    coleccion.case_id
-                ):
-                    print("Cargando CONSULTA ESPACIOS...")
-            return redirect(url_for("home"))
-        else:
-            return render_template(
-                "collection/reprogramar.html", coleccion=coleccion, form=form
+            coleccion.modificar_entrega(coleccion.fecha_lanzamiento - timedelta(10))
+            set_bonita_variable(
+                coleccion.case_id, "reprogramar_lanzamiento", "false", "java.lang.Boolean"
             )
+            flash("Colección reprogramada con éxito!", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
     return redirect(url_for("home"))

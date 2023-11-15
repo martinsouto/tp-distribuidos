@@ -64,12 +64,15 @@ def finalizar_tarea(id_coleccion, id_tarea):
     tarea.finalizar()
 
     if Tarea.coleccion_finalizada(id_coleccion):
+        if datetime.now() > Coleccion.get_by_id(id_coleccion).fecha_entrega:
+            flash("La coleccion finalizó con demora, (REPROGRAMAR)", "error")
+            set_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean")
+        else:
+            flash("Tareas finalizadas", "success")
         coleccion = Coleccion.get_by_id(id_coleccion)
         set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
-        #Hay que ver si es necesario poner esta variable en True en este momento
-        #set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
-        flash("Tareas finalizadas", "success")
-        #return redirect(url_for("home"))
+        set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
+        return redirect(url_for("home"))
     else:
         flash("Tarea finalizada", "success")
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 # LoginManager
 from flask_login import LoginManager, login_required
-from app.resources.bonita import get_completed_tasks_by_name, get_ready_tasks
+from app.resources.bonita import get_completed_tasks_by_name, get_ready_tasks, get_bonita_variable
 
 def create_app():
     app = Flask(__name__)
@@ -53,6 +53,7 @@ def create_app():
     app.jinja_env.globals.update(
         get_ready_tasks=get_ready_tasks,
         get_completed_tasks_by_name=get_completed_tasks_by_name,
+        get_bonita_variable=get_bonita_variable,
     )
 
     

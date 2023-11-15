@@ -161,4 +161,8 @@ def get_bonita_variable(case_id, variable_name):
     URL = ("http://localhost:8080/bonita/API/bpm/caseVariable/"+ str(case_id)+ "/"+ variable_name)
     headers = getBonitaHeaders()
     response = requestSession.get(URL, headers=headers)
-    return response.json()["value"]
+    if response.status_code == 200:
+        print("Response del get variable "+variable_name+" para el case "+str(case_id)+":", response.json()["value"])
+        return response.json()["value"]
+    else:
+        return False
