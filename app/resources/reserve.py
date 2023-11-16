@@ -354,7 +354,7 @@ def seleccionar_espacio(id_coleccion):
 @bp.route('/<int:id_coleccion>/recibir_materiales', methods=['GET', 'POST'])
 def recibir_materiales(id_coleccion):
     if session["current_rol"] == "Operaciones":
-                #chequeo si la fecha actual es mayor a la fecha de recepcion de materiales
+        #chequeo si la fecha actual es mayor a la fecha de recepcion de materiales
         if datetime.now() > Coleccion.get_by_id(id_coleccion).fecha_recepcion_materiales:
             # Seteo la variable de bonita materiales_atrasados
             set_bonita_variable(
@@ -364,10 +364,10 @@ def recibir_materiales(id_coleccion):
             set_bonita_variable(
                 Coleccion.get_by_id(id_coleccion).case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean"
             )
-            flash("Materiales recibidos atrasados, (REPROGRAMAR)", "error")
             set_bonita_variable(
                 Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
             )
+            flash("Materiales recibidos atrasados, (REPROGRAMAR)", "error")
         else:
             set_bonita_variable(
                 Coleccion.get_by_id(id_coleccion).case_id, "materiales_disponibles", "true", "java.lang.Boolean"
@@ -375,6 +375,15 @@ def recibir_materiales(id_coleccion):
             flash("Materiales recibidos!", "success")
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
+    while ("Esperar materiales" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+        print("Cargando...")
+    taskId = getUserTaskByName(
+        "Esperar materiales",
+        Coleccion.get_by_id(id_coleccion).case_id,
+    )
+    assign_task(taskId)
+    # Se finaliza la tarea
+    updateUserTask(taskId, "completed")
     # Espero a que avance a la siguiente tarea antes de redirigir al home, para mostrar bien los botones
     while ("Elaborar plan de fabricacion" or "Seleccionar fecha de lanzamiento" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
         print("Cargando...")

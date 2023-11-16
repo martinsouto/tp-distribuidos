@@ -22,7 +22,7 @@ class Tipo(db.Model, UserMixin):
         self.name = name
 
     def crear(name):
-        """Crea un tipo de anteojo"""
+        """Crea un tipo de mueble"""
         tipo = Tipo(name)
         db.session.add(tipo)
         db.session.commit()

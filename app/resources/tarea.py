@@ -7,7 +7,7 @@ from app.models.tarea import Tarea
 from app.models.collection import Coleccion
 from app.form.tarea.alta_tarea import FormAltaTarea
 from datetime import datetime
-from app.resources.bonita import set_bonita_variable
+from app.resources.bonita import assign_task, get_ready_tasks, getUserTaskByName, set_bonita_variable, updateUserTask
 from app.resources.collection import bp
 #REFACTORIZADO
 @bp.route('/<int:id_coleccion>/crear_tarea', methods=['POST'])
@@ -71,11 +71,18 @@ def finalizar_tarea(id_coleccion, id_tarea):
             flash("Tareas finalizadas", "success")
         coleccion = Coleccion.get_by_id(id_coleccion)
         set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
-        set_bonita_variable(coleccion.case_id, "coleccion_fabricada", "true", "java.lang.Boolean")
-        return redirect(url_for("home"))
+        set_bonita_variable(coleccion.case_id, "coleccion_finalizada", "true", "java.lang.Boolean")
+        while ("Esperar finalizar hitos" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
+            print("Cargando...")
+        taskId = getUserTaskByName(
+            "Esperar finalizar hitos",
+            Coleccion.get_by_id(id_coleccion).case_id,
+        )
+        assign_task(taskId)
+        # Se finaliza la tarea
+        updateUserTask(taskId, "completed")
     else:
         flash("Tarea finalizada", "success")
-
     tareas = Tarea.get_by_coleccion_id(id_coleccion)
     form = FormAltaTarea()
     return render_template(
