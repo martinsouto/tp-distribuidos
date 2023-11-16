@@ -31,7 +31,7 @@ def create_app():
     from app.models.material import Material
     from app.models.model import Modelo
     from app.models.tipo import Tipo
-    from app.models.tarea import Tarea
+    from app.models.hito import Hito
     from app.models.coleccion_sede import Coleccion_sede
     from app.models.sede import Sede
 
@@ -62,7 +62,7 @@ def create_app():
     def home():
         return render_template("home.html")
     
-    from app.resources import collection, auth, reserve, type, tarea
+    from app.resources import collection, auth, reserve, type, hito
     from app.resources.model import model
     
     app.register_blueprint(collection.bp)

@@ -4,8 +4,8 @@ from app.db import db
 from flask_login import UserMixin
 
 
-class Tarea(db.Model, UserMixin):
-    __tablename__ = "tarea"
+class Hito(db.Model, UserMixin):
+    __tablename__ = "hito"
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True)
@@ -32,49 +32,49 @@ class Tarea(db.Model, UserMixin):
         self.finalizada = False
 
     def crear(nombre, descripcion, fecha_limite, coleccion_id):
-        """Crea una tarea"""
-        tarea = Tarea(nombre, descripcion, fecha_limite, coleccion_id)
-        db.session.add(tarea)
+        """Crea un hito"""
+        hito = Hito(nombre, descripcion, fecha_limite, coleccion_id)
+        db.session.add(hito)
         db.session.commit()
 
     def eliminar(self):
-        """Elimina una tarea"""
+        """Elimina un hito"""
         db.session.delete(self)
         db.session.commit()
 
     def finalizar(self):
-        """Elimina una tarea"""
+        """Elimina un hito"""
         self.finalizada = True
         db.session.commit()
 
-    def tareas():
-        """Devuelve todos los tareas"""
-        return Tarea.query.all()
+    def hitos():
+        """Devuelve todos los hitos"""
+        return Hito.query.all()
 
     def get_by_name(nombre):
-        """Devuelve un tarea por su nombre"""
-        return Tarea.query.filter_by(nombre=nombre).first()
+        """Devuelve un hito por su nombre"""
+        return Hito.query.filter_by(nombre=nombre).first()
 
     def get_by_name_and_coleccion(nombre, coleccion_id):
-        """Devuelve un tarea por su nombre y coleccion_id"""
-        return Tarea.query.filter_by(nombre=nombre, coleccion_id=coleccion_id).first()
+        """Devuelve un hito por su nombre y coleccion_id"""
+        return Hito.query.filter_by(nombre=nombre, coleccion_id=coleccion_id).first()
 
     def get_by_id(id):
-        """Devuelve un tarea por su id"""
-        return Tarea.query.filter_by(id=id).first()
+        """Devuelve un hito por su id"""
+        return Hito.query.filter_by(id=id).first()
 
     def get_by_coleccion_id(coleccion_id):
-        """Devuelve un tarea por su coleccion_id"""
-        return Tarea.query.filter_by(coleccion_id=coleccion_id).all()
+        """Devuelve un hito por su coleccion_id"""
+        return Hito.query.filter_by(coleccion_id=coleccion_id).all()
 
     def coleccion_finalizada(id_coleccion):
-        """Devuelve True si todas las tareas de una coleccion estan finalizadas"""
-        tareas = Tarea.query.filter_by(coleccion_id=id_coleccion, finalizada=False).all()
-        return len(tareas) == 0
+        """Devuelve True si todos los hitos de una coleccion estan finalizadas"""
+        hitos = Hito.query.filter_by(coleccion_id=id_coleccion, finalizada=False).all()
+        return len(hitos) == 0
 
     def eliminar_todas(coleccion_id):
-        """Elimina todas las tareas de una coleccion"""
-        lista = Tarea.query.filter_by(coleccion_id=coleccion_id).all()
+        """Elimina todas los hitos de una coleccion"""
+        lista = Hito.query.filter_by(coleccion_id=coleccion_id).all()
         for l in lista:
             db.session.delete(l)
             db.session.commit()

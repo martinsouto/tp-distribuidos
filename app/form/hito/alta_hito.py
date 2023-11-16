@@ -2,10 +2,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField
 from wtforms.validators import DataRequired, Regexp, Length, ValidationError
 from datetime import date
-from app.models.tarea import Tarea
+from app.models.hito import Hito
 
 
-class FormAltaTarea(FlaskForm):
+class FormAltaHito(FlaskForm):
     fin_fabricacion = DateField()
     id_coleccion = IntegerField()
 
@@ -21,9 +21,9 @@ class FormAltaTarea(FlaskForm):
     )
 
     def validate_nombre(self, nombreV):
-        tarea = Tarea.get_by_name_and_coleccion(nombreV.data, self.id_coleccion)
-        if tarea != None:
-            raise ValidationError("Ya existe ese nombre para otra tarea de esta colección")
+        hito = Hito.get_by_name_and_coleccion(nombreV.data, self.id_coleccion)
+        if hito != None:
+            raise ValidationError("Ya existe ese nombre para otro hito de esta colección")
 
     descripcion = StringField(
         "Descripción",

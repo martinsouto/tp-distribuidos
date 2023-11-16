@@ -28,7 +28,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Creación de tareas del plan de fabricación</div>
+                <div class="card-header">Creación de hitos del plan de fabricación</div>
                 <div class="card-body">
                     <form class="form" method="POST" action="{{ url_for('collection.elaborar_plan', id_coleccion=coleccion.id) }}">
                         <div class="form-group">
@@ -47,9 +47,9 @@
                                             </tr>
                                             <tr>
                                                 <th class="col align-self-center" colspan="4">
-                                                    Tareas <button type="button" class="badge badge-pill badge-success"
+                                                    Hitos <button type="button" class="badge badge-pill badge-success"
                                                         data-toggle="modal" data-target="#tareaModal">
-                                                        Nueva Tarea
+                                                        Nuevo hito
                                                     </button>
                                                 </th>
                                             </tr>
@@ -77,28 +77,28 @@
                                                     </td>
                                                 </div>
                                             </tr>
-                                            {% if tareas %}
-                                            {% for tarea in tareas %}
+                                            {% if hitos %}
+                                            {% for hito in hitos %}
                                             <tr>
                                                 <div class="col-md-3">
                                                     <td class="col-md-3">
-                                                        {{tarea.nombre}}
+                                                        {{hito.nombre}}
                                                     </td>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <td class="col-md-3">
-                                                        {{tarea.descripcion}}
+                                                        {{hito.descripcion}}
                                                     </td>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <td class="col-md-3">
-                                                        {{tarea.fecha_limite.strftime('%d-%m-%Y')}}
+                                                        {{hito.fecha_limite.strftime('%d-%m-%Y')}}
                                                     </td>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <td class="col-md-3">
                                                         <form method="DELETE"
-                                                            action="{{ url_for('collection.eliminar_tarea',id_coleccion=coleccion.id, id_tarea=tarea.id) }}"
+                                                            action="{{ url_for('collection.eliminar_hito',id_coleccion=coleccion.id, id_hito=hito.id) }}"
                                                             class="formulario-eliminar" style="display: inline;">
                                                             <input class="btn btn-danger btn-sm" type="submit"
                                                                 value="Eliminar">
@@ -111,7 +111,7 @@
                                             <tr class="col-md-3" colspan="4">
                                                 <div class="col-md-3" colspan="4">
                                                     <td class="col-md-3" colspan="4">
-                                                        No hay tareas cargadas.
+                                                        No hay hitos  cargados.
                                                     </td>
                                                 </div>
                                             </tr>
@@ -128,13 +128,13 @@
                             </div>
                     </form>
 
-                    <!-- MODAL DE CREAR TAREA -->
+                    <!-- MODAL DE CREAR HITO -->
                     <div class="modal fade" id="tareaModal" tabindex="-1" role="dialog"
                         aria-labelledby="tareaModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="tareaModalLabel">Crear nueva tarea <a href="#"
+                                    <h5 class="modal-title" id="tareaModalLabel">Crear nuevo hito <a href="#"
                                             class="badge badge-pill badge-primary">Fecha de entrega:
                                             {{coleccion.fin_fabricacion.strftime('%d-%m-%Y')}}</a></h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -143,7 +143,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <form class="form-horizontal" method="POST"
-                                        action="{{ url_for('collection.crear_tarea', id_coleccion=coleccion.id)}}" novalidate>
+                                        action="{{ url_for('collection.crear_hito', id_coleccion=coleccion.id)}}" novalidate>
                                         {{ form.csrf_token }}
                                         {{ form.hidden_tag() }}
                                         <div class="form-group">

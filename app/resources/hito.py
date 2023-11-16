@@ -3,22 +3,22 @@ from flask import (
     redirect, render_template, url_for, flash, session, request, Blueprint
 )
 from flask_login import login_required, current_user
-from app.models.tarea import Tarea
+from app.models.hito import Hito
 from app.models.collection import Coleccion
-from app.form.tarea.alta_tarea import FormAltaTarea
+from app.form.hito.alta_hito import FormAltaHito
 from datetime import datetime
 from app.resources.bonita import assign_task, get_ready_tasks, getUserTaskByName, set_bonita_variable, updateUserTask
 from app.resources.collection import bp
 #REFACTORIZADO
-@bp.route('/<int:id_coleccion>/crear_tarea', methods=['POST'])
+@bp.route('/<int:id_coleccion>/crear_hito', methods=['POST'])
 @login_required
-def crear_tarea(id_coleccion):
+def crear_hito(id_coleccion):
     coleccion = Coleccion.get_by_id(id_coleccion)
     if session["current_rol"] != "Operaciones":
         flash("No tienes permiso para acceder a este sitio", "error")
         return redirect(url_for("home"))
 
-    form = FormAltaTarea()
+    form = FormAltaHito()
     form.fin_fabricacion = coleccion.fin_fabricacion
     form.id_coleccion = id_coleccion
 
@@ -26,49 +26,49 @@ def crear_tarea(id_coleccion):
         nombre = form.nombre.data
         descripcion = form.descripcion.data
         fecha_limite = form.fecha_limite.data
-        Tarea.crear(nombre, descripcion, fecha_limite, id_coleccion)
-        flash("Tarea creada", "success")
+        Hito.crear(nombre, descripcion, fecha_limite, id_coleccion)
+        flash("Hito creado", "success")
     else:
-        flash("Hay errores en los campos de la tarea", "error")
+        flash("Hay errores en los campos del hito", "error")
 
-    tareas = Tarea.get_by_coleccion_id(id_coleccion)
+    hitos = Hito.get_by_coleccion_id(id_coleccion)
     return render_template(
-        "collection/planificar_fabricacion.html", coleccion=coleccion, tareas=tareas, form=form
+        "collection/planificar_fabricacion.html", coleccion=coleccion, hitos=hitos, form=form
     )
 
-@bp.route('/<int:id_coleccion>/<int:id_tarea>/eliminar', methods=['GET', 'DELETE'])
+@bp.route('/<int:id_coleccion>/<int:id_hito>/eliminar', methods=['GET', 'DELETE'])
 @login_required
-def eliminar_tarea(id_coleccion, id_tarea):
+def eliminar_hito(id_coleccion, id_hito):
     if session["current_rol"] != "Operaciones":
         flash("No tienes permiso para acceder a este sitio", "error")
         return redirect(url_for("home"))
 
-    tarea = Tarea.get_by_id(id_tarea)
-    tarea.eliminar()
-    flash("Tarea eliminada", "success")
+    hito = Hito.get_by_id(id_hito)
+    hito.eliminar()
+    flash("Hito eliminado", "success")
 
-    tareas = Tarea.get_by_coleccion_id(id_coleccion)
-    form = FormAltaTarea()
+    hitos = Hito.get_by_coleccion_id(id_coleccion)
+    form = FormAltaHito()
     return render_template(
-        "collection/planificar_fabricacion.html", coleccion=Coleccion.get_by_id(id_coleccion), tareas=tareas, form=form
+        "collection/planificar_fabricacion.html", coleccion=Coleccion.get_by_id(id_coleccion), hitos=hitos, form=form
     )
 
-@bp.route('/<int:id_coleccion>/<int:id_tarea>/finalizar', methods=['GET','POST'])
+@bp.route('/<int:id_coleccion>/<int:id_hito>/finalizar', methods=['GET','POST'])
 @login_required
-def finalizar_tarea(id_coleccion, id_tarea):
+def finalizar_hito(id_coleccion, id_hito):
     if session["current_rol"] != "Operaciones":
         flash("No tienes permiso para acceder a este sitio", "error")
         return redirect(url_for("home"))
 
-    tarea = Tarea.get_by_id(id_tarea)
-    tarea.finalizar()
+    hito = Hito.get_by_id(id_hito)
+    hito.finalizar()
 
-    if Tarea.coleccion_finalizada(id_coleccion):
+    if Hito.coleccion_finalizada(id_coleccion):
         if datetime.now() > Coleccion.get_by_id(id_coleccion).fecha_entrega:
             flash("La coleccion finalizó con demora, (REPROGRAMAR)", "error")
             set_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean")
         else:
-            flash("Tareas finalizadas", "success")
+            flash("Hitos finalizados", "success")
         coleccion = Coleccion.get_by_id(id_coleccion)
         set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
         set_bonita_variable(coleccion.case_id, "coleccion_finalizada", "true", "java.lang.Boolean")
@@ -82,10 +82,10 @@ def finalizar_tarea(id_coleccion, id_tarea):
         # Se finaliza la tarea
         updateUserTask(taskId, "completed")
     else:
-        flash("Tarea finalizada", "success")
-    tareas = Tarea.get_by_coleccion_id(id_coleccion)
-    form = FormAltaTarea()
+        flash("Hito finalizado", "success")
+    hitos = Hito.get_by_coleccion_id(id_coleccion)
+    form = FormAltaHito()
     return render_template(
-        "collection/administrar_tareas.html", coleccion=Coleccion.get_by_id(id_coleccion), tareas=tareas, form=form
+        "collection/administrar_hitos.html", coleccion=Coleccion.get_by_id(id_coleccion), hitos=hitos, form=form
     )
 

@@ -3,13 +3,13 @@ from pipes import quote
 from app.form.coleccion.alta_coleccion import FormAltaColeccion
 from app.form.coleccion.reprogramar_coleccion import FormReprogramarColeccion
 from app.form.modelo.alta_modelo import FormAltaModelo
-from app.form.tarea.alta_tarea import FormAltaTarea
+from app.form.hito.alta_hito import FormAltaHito
 from app.models.collection import Coleccion
 from flask import Blueprint, flash, g, render_template, url_for, request, session, redirect
 import json  # Importa la biblioteca json
 import requests
 from app.models.sede import Sede  # Importa la biblioteca requests
-from app.models.tarea import Tarea
+from app.models.hito import Hito
 from app.resources.auth import login_required
 from app.resources.bonita import *
 from app.models.coleccion_sede import Coleccion_sede
@@ -79,14 +79,14 @@ def crear():
 @login_required
 def planificar_fabricacion(id_coleccion):
     """Planificación de la fabricación de una coleccion"""
-    form = FormAltaTarea()
+    form = FormAltaHito()
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
-        tareas = Tarea.get_by_coleccion_id(id_coleccion)
+        hitos = Hito.get_by_coleccion_id(id_coleccion)
         return render_template(
             "collection/planificar_fabricacion.html",
             coleccion=coleccion,
-            tareas=tareas,
+            hitos=hitos,
             form=form,
         )
     else:
@@ -98,8 +98,8 @@ def planificar_fabricacion(id_coleccion):
 def elaborar_plan(id_coleccion):
     """Elaboración del plan de fabricación de una coleccion"""
     if session["current_rol"] == "Operaciones":
-        tareas = Coleccion.get_by_id(id_coleccion).tareas
-        print(tareas)
+        hitos = Coleccion.get_by_id(id_coleccion).hitos
+        print(hitos)
         taskId = getUserTaskByName(
             "Elaborar plan de fabricacion",
             Coleccion.get_by_id(id_coleccion).case_id,
@@ -112,20 +112,20 @@ def elaborar_plan(id_coleccion):
         flash("No tienes permiso para acceder a este sitio", "error")
     #return redirect(url_for("home"))
     coleccion = Coleccion.get_by_id(id_coleccion)
-    tareas = Tarea.get_by_coleccion_id(id_coleccion)
+    hitos = Hito.get_by_coleccion_id(id_coleccion)
     return render_template(
-            "collection/administrar_tareas.html", coleccion=coleccion, tareas=tareas
+            "collection/administrar_hitos.html", coleccion=coleccion, hitos=hitos
         )
 
-@bp.route('/<int:id_coleccion>/administrar_tareas', methods=['GET'])
+@bp.route('/<int:id_coleccion>/administrar_hitos', methods=['GET'])
 @login_required
-def administrar_tareas(id_coleccion):
-    """Administración de las tareas de una coleccion"""
+def administrar_hitos(id_coleccion):
+    """Administración de los hitos de una coleccion"""
     if session["current_rol"] == "Operaciones":
         coleccion = Coleccion.get_by_id(id_coleccion)
-        tareas = Tarea.get_by_coleccion_id(id_coleccion)
+        hitos = Hito.get_by_coleccion_id(id_coleccion)
         return render_template(
-            "collection/administrar_tareas.html", coleccion=coleccion, tareas=tareas
+            "collection/administrar_hitos.html", coleccion=coleccion, hitos=hitos
         )
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
@@ -139,7 +139,7 @@ def eliminar_coleccion(id_coleccion):
         coleccion = Coleccion.get_by_id(id_coleccion)
         deleteCase(coleccion.case_id)
         Coleccion_sede.eliminar(id_coleccion)
-        Tarea.eliminar_todas(id_coleccion)
+        Hito.eliminar_todas(id_coleccion)
         Coleccion.eliminar(id_coleccion)
         print("pase")
         flash("Colección eliminada exitosamente", "success")
