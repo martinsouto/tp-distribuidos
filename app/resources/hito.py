@@ -64,14 +64,11 @@ def finalizar_hito(id_coleccion, id_hito):
     hito.finalizar()
 
     if Hito.coleccion_finalizada(id_coleccion):
-        if datetime.now() > Coleccion.get_by_id(id_coleccion).fecha_entrega:
-            flash("La coleccion finalizó con demora, (REPROGRAMAR)", "error")
-            set_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento", "true", "java.lang.Boolean")
-        else:
-            flash("Hitos finalizados", "success")
+        flash("Hitos finalizados", "success")
         coleccion = Coleccion.get_by_id(id_coleccion)
         set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
         set_bonita_variable(coleccion.case_id, "coleccion_finalizada", "true", "java.lang.Boolean")
+        set_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento", "false", "java.lang.Boolean")
         while ("Esperar finalizar hitos" not in get_ready_tasks(Coleccion.get_by_id(id_coleccion).case_id)):
             print("Cargando...")
         taskId = getUserTaskByName(

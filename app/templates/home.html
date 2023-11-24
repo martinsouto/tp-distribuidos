@@ -207,7 +207,34 @@
                                 {% endif %}
 
                                 {% if session["current_rol"] == "Operaciones" %}
-                                {% if get_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento") == "true" %}
+                                {% if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id) or "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricacion" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion") %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif "Esperar materiales" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif "Esperar finalizar hitos" in get_ready_tasks(coleccion.case_id) %}
                                 <td>
                                     <form method="POST"
                                         action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
