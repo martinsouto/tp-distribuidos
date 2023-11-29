@@ -62,13 +62,14 @@ def create_app():
     def home():
         return render_template("home.html")
     
-    from app.resources import collection, auth, reserve, type, hito
+    from app.resources import collection, auth, reserve, type, hito, metrics
     from app.resources.model import model
     
     app.register_blueprint(collection.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(model.bp)
     app.register_blueprint(type.bp)
+    app.register_blueprint(metrics.bp)
     
     return app
 
