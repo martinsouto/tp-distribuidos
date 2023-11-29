@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == "success" %}
+    <div class="alert alert-success alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card align-self-center">
+                <div class="card-header">Métricas</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col-md-3">
+                                    Cantidad de colecciones creadas
+                                </th>
+                                <th class="col-md-3">
+                                    Modelo más utilizado (cantidad)
+                                </th>
+                                <th class="col-md-3">
+                                    Cantidad de casos activos
+                                </th>
+                                <th class="col-md-3">
+                                    Cantidad de casos cerrados
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-md-3">
+                                    {{cantidadDeColeccionesCreadas}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{modeloMasUsado.name}}: {{cantModeloMasUsado}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{casosActivos}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{casosCerrados}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

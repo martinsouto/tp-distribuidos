@@ -166,3 +166,22 @@ class Coleccion(db.Model, UserMixin):
         """Modifica la fecha de entrega de materiales de la coleccion"""
         self.fecha_recepcion_materiales = nueva_fecha
         db.session.commit()
+
+    def get_most_used_model():
+        query = db.engine.execute(
+            text(
+                "SELECT modelo_id, COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
+            )
+        )
+        modelo_id = [row[0] for row in query][0]
+        modelo = Modelo.get_by_id(modelo_id)
+        return modelo
+    
+    def get_cant_most_used_model():
+        query = db.engine.execute(
+            text(
+                "SELECT COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
+            )
+        )
+        cant = [row[0] for row in query][0]
+        return cant

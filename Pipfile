@@ -11,6 +11,7 @@ flask-wtf = "==1.2.1"
 requests = "==2.28.1"
 flask-sqlalchemy = "==3.1.1"
 pymysql = "==1.1.0"
+flask-login = "==0.6.2"
 
 [dev-packages]
 
