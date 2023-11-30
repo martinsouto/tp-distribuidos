@@ -11,7 +11,7 @@ bp = Blueprint('model', __name__, url_prefix="/model")
 def crear():
     """Creación de un nuevo modelo"""
     #TENDRIA QUE SER CREATIVA
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Creativa":
         form = FormAltaModelo()
         if form.validate_on_submit():
             nombre = form.nombre.data

@@ -30,7 +30,7 @@
         <div class="col-md-16">
             <div class="card align-self-center">
                 <div class="card-header">Colecciones
-                    {% if session["current_rol"] == "Operaciones" %}
+                    {% if session["current_rol"] == "Creativa" %}
                     <a class="badge badge-pill badge-primary" href="{{ url_for('collection.crear') }}"
                         role="button">Nueva</a>
                     {% endif %}
@@ -61,11 +61,11 @@
                                 <th class="col-md-3">
                                     Fabricación
                                 </th>
-                                {% elif session["current_rol"] == "Operaciones" %}
+                                {% elif session["current_rol"] == "Comercial" %}
                                 <th class="col-md-3">
                                     Distribución
                                 </th>
-                                {% elif session["current_rol"] == "Operaciones" %}
+                                {% elif session["current_rol"] == "Creativa" %}
                                 <th class="col-md-3">
                                     Reprogramación
                                 </th>
@@ -169,7 +169,7 @@
                                     <h6 style="color: green;">Materiales recibidos!</h6>  
                                 </td>
                                 {% else %}
-                                <td class="col-md-3"> Nada que hacer...reservas</td>
+                                <td class="col-md-3 text-center"> - </td>
                                 {% endif %}
                                 {% endif %}
 
@@ -189,11 +189,11 @@
                                     </a>
                                 </td>
                                 {% else %}
-                                <td class="col-md-3"> Nada que hacer...</td>
+                                <td class="col-md-3 text-center"> - </td>
                                 {% endif %}
                                 {% endif %}
 
-                                {% if session["current_rol"] == "Operaciones" %}
+                                {% if session["current_rol"] == "Comercial" %}
                                 {% if "Iniciar planificacion de distribucion" in get_ready_tasks(coleccion.case_id) %}
                                 <td class="col-md-3">
                                     <a class="btn btn-primary"
@@ -209,11 +209,11 @@
                                     <h6 style="color: green;">Lotes enviados!</h6>  
                                 </td>
                                 {% else %}
-                                <td class="col-md-3"> Nada que hacer...</td>
+                                <td class="col-md-3 text-center"> - </td>
                                 {% endif %}
                                 {% endif %}
 
-                                {% if session["current_rol"] == "Operaciones" %}
+                                {% if session["current_rol"] == "Creativa" %}
                                 {% if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id) or "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
                                 <td>
                                     <form method="POST"
@@ -251,7 +251,7 @@
                                     </form>
                                 </td>
                                 {% else %}
-                                <td class="col-md-3"> Nada que hacer...</td>
+                                <td class="col-md-3 text-center"> - </td>
                                 {% endif %}
                                 {% endif %}
 
@@ -265,7 +265,7 @@
                                     </form>
                                 </td>
                                 {% else %}
-                                    <td class="col-md-3"> Nada que hacer...</td>
+                                <td class="col-md-3 text-center"> - </td>
                                 {% endif %}
                                 {% endif %}
                             </tr>

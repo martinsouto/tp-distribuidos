@@ -24,7 +24,7 @@ bp = Blueprint('collection', __name__, url_prefix="/collection")
 @login_required
 def crear():
     """Creación de una nueva coleccion"""
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Creativa":
         form = FormAltaColeccion()
         if form.validate_on_submit():
             nombre = form.nombre.data
@@ -46,6 +46,7 @@ def crear():
             assign_task(taskId)
             # Se finaliza la tarea
             updateUserTask(taskId, "completed")
+            print("SE REALIZO LA SELECCION DE FECHA DE LANZAMIENTO")
             # Si todo salió bien se crea la colección
             # resto 10 días para setear fecha entrega y mando vacio para los modelos
             Coleccion.crear(
@@ -54,7 +55,7 @@ def crear():
                 form.cantidad_muebles.data,
                 fecha_lanzamiento,
                 fecha_lanzamiento - datetime.timedelta(10),
-                [1],
+                [1, 2, 3],
                 modelos,
             )
             # Cargar las variables en bonita
@@ -152,7 +153,7 @@ def eliminar_coleccion(id_coleccion):
 @login_required
 def nueva_distribucion(id_coleccion):
     """Planificación de la distribución de una coleccion"""
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Comercial":
         coleccion = Coleccion.get_by_id(id_coleccion)
         sedes = Sede.sedes()
         return render_template(
@@ -168,7 +169,7 @@ def nueva_distribucion(id_coleccion):
 @login_required
 def planificar_distribucion(id_coleccion):
     """Planificación de la distribución de una coleccion"""
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Comercial":
         cantidades = request.form.getlist("cantidades[]")
         coleccion = Coleccion.get_by_id(id_coleccion)
         cant = 0
@@ -211,7 +212,7 @@ def planificar_distribucion(id_coleccion):
 @login_required
 def ver_lotes(id_coleccion):
     """Visualización de los lotes de una coleccion"""
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Comercial":
         coleccion = Coleccion.get_by_id(id_coleccion)
         lotes = Coleccion_sede.get_by_id_coleccion(id_coleccion)
         return render_template(
@@ -229,7 +230,7 @@ def enviar_lote(id_lote):
     """Envío de un lote de una coleccion"""
     lote = Coleccion_sede.get_by_id(id_lote)
     coleccion = Coleccion.get_by_id(lote.id_coleccion)
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Comercial":
         #obtengo la variable de bonita coleccion_finalizada. Si es true, no se puede enviar
         if get_bonita_variable(coleccion.case_id, "coleccion_finalizada") != "true":
             flash("No se puede enviar el lote porque la colección aún no finalizó", "error")
@@ -260,7 +261,7 @@ def enviar_lote(id_lote):
 @login_required
 def reprogramar(id_coleccion):
     """Reprogramación de una coleccion"""
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Creativa":
         form = FormReprogramarColeccion()
         coleccion = Coleccion.get_by_id(id_coleccion)
         form.fecha_lanzamiento.data = coleccion.fecha_lanzamiento
@@ -274,7 +275,7 @@ def reprogramar(id_coleccion):
 @bp.route('/<int:id_coleccion>/modificar_fecha', methods=['POST'])
 @login_required
 def modificar_fecha(id_coleccion):
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Creativa":
         form = FormReprogramarColeccion()
         coleccion = Coleccion.get_by_id(id_coleccion)
         if form.validate_on_submit():

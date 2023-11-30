@@ -10,7 +10,7 @@ bp = Blueprint('type', __name__, url_prefix="/type")
 def crear():
     """Creación de un nuevo tipo de mueble"""
     #TENDRIA QUE SER CREATIVA
-    if session["current_rol"] == "Operaciones":
+    if session["current_rol"] == "Creativa":
         form = FormAltaTipo()
         if form.validate_on_submit():
             nombre = form.nombre.data
