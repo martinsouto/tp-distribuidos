@@ -186,3 +186,10 @@ class Coleccion(db.Model, UserMixin):
         )
         cant = [row[0] for row in query][0]
         return cant
+    
+    def get_creador(self):
+        """Devuelve el usuario que creó la colección"""
+        if self.coleccion_tiene_usuario:
+            # Suponiendo que el primer usuario en la lista es el creador
+            return self.coleccion_tiene_usuario[0]
+        return None

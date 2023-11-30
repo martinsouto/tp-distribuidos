@@ -64,8 +64,15 @@ def finalizar_hito(id_coleccion, id_hito):
     hito.finalizar()
 
     if Hito.coleccion_finalizada(id_coleccion):
-        flash("Hitos finalizados", "success")
         coleccion = Coleccion.get_by_id(id_coleccion)
+        #obtengo el usuario que creo la coleccion
+        user = Coleccion.get_by_id(id_coleccion).get_creador()
+        #armo el email haciendo user.username + @gmail.com
+        email = user.username + "@gmail.com"
+        #imprimo el email para ver si esta bien
+        print(email)
+        set_bonita_variable(coleccion.case_id, "userEmail", email, "java.lang.String")
+        flash("Hitos finalizados", "success")
         set_bonita_variable(coleccion.case_id, "hitos_cumplidos", "true", "java.lang.Boolean")
         set_bonita_variable(coleccion.case_id, "coleccion_finalizada", "true", "java.lang.Boolean")
         set_bonita_variable(coleccion.case_id, "reprogramar_lanzamiento", "false", "java.lang.Boolean")
