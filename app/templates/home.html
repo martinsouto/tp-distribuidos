@@ -117,6 +117,7 @@
                                                                 <th scope="col">Nombre</th>
                                                                 <th scope="col">Descripción</th>
                                                                 <th scope="col">Tipo</th>
+                                                                <th scope="col">Imagen</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -125,6 +126,12 @@
                                                                 <td>{{modelo.name}}</td>
                                                                 <td>{{modelo.descripcion}}</td>
                                                                 <td>{{modelo.tipo.name}}</td>
+                                                                #la imagen de abajo es de prueba y hay que cambiarla por la direccion de la imagen de la base de datos
+                                                                <td>
+                                                                    <img src="https://media.istockphoto.com/photos/simple-classic-wooden-chair-isolated-on-white-background-studio-picture-id172410116?s=612x612"
+                                                                         alt="imagen" style="max-width: 100%; height: auto;">
+                                                                </td>
+                                                                
                                                             </tr>
                                                             {% endfor %}
                                                         </tbody>

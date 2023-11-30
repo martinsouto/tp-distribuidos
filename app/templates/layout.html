@@ -20,15 +20,15 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
-        <style>
-            body {
-                background-color: #708090;
-            }
-    
-            .footer-color {
-                background-color: #708090;
-            }
-        </style>
+    <style>
+        body {
+            background-color: #708090;
+        }
+
+        .footer-color {
+            background-color: #708090;
+        }
+    </style>
 
     {% endblock %}
 </head>
@@ -39,26 +39,24 @@
             <div class="container-fluid">
                 <a class="navbar-brand" href="/">Inicio</a>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    {% if current_user.is_authenticated and session["current_rol"] == "Creativa"%}
+                    {% if current_user.is_authenticated and session["current_rol"] == "Operaciones"%}
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('nueva_coleccion') }}">Crear colección</a>
+                            <a class="nav-link" href="{{ url_for('collection.crear') }}">Crear colección</a>
                         </li>
-                    </ul>
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('nuevo_tipo') }}">Crear tipo</a>
+                            <a class="nav-link" href="{{ url_for('type.crear') }}">Crear tipo</a>
                         </li>
-                    </ul>
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('nuevo_modelo') }}">Crear modelo</a>
+                            <a class="nav-link" href="{{ url_for('model.crear') }}">Crear modelo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('metrics.index') }}">Ver métricas</a>
                         </li>
                     </ul>
                     {% endif %}
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
+                        
                     </ul>
                     <span class="navbar-text">
                         {% if current_user.is_authenticated %}

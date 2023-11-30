@@ -12,7 +12,9 @@
                 <div class="card-header">Nuevo modelo</div>
                 <div class="card-body">
 
-                    <form class="form-horizontal" method="POST" action="{{ url_for('model.crear') }}" novalidate>
+                    <form class="form-horizontal" method="POST" action="{{ url_for('model.crear') }}" novalidate
+                        enctype="multipart/form-data">
+                        <!-- Agregado el atributo enctype para permitir la carga de archivos -->
                         {{ form.hidden_tag() }}
                         <div class="form-group">
                             <div class="form-group row justify-content-center">
@@ -45,6 +47,13 @@
                                         <option value="{{tipo.id}}">{{tipo.name}}</option>
                                         {% endfor %}
                                     </select>
+                                </div>
+                            </div>
+                            <!-- Agregado el campo de carga de archivos -->
+                            <div class="form-group row justify-content-center">
+                                <label for="foto" class="col-md-8 col-form-label text-md-left">Foto</label>
+                                <div class="col-md-8">
+                                    <input type="file" id="foto" name="foto" accept="image/*">
                                 </div>
                             </div>
                         </div>
