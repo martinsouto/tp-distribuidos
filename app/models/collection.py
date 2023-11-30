@@ -168,17 +168,18 @@ class Coleccion(db.Model, UserMixin):
         db.session.commit()
 
     def get_most_used_model():
-        query = db.engine.execute(
+        query = db.engine.connect().execute(
             text(
                 "SELECT modelo_id, COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
             )
         )
-        modelo_id = [row[0] for row in query][0]
+        for row in query:
+            modelo_id = row[0]
         modelo = Modelo.get_by_id(modelo_id)
         return modelo
     
     def get_cant_most_used_model():
-        query = db.engine.execute(
+        query = db.engine.connect().execute(
             text(
                 "SELECT COUNT(modelo_id) as total FROM coleccion_tiene_modelo GROUP BY modelo_id ORDER BY total desc LIMIT 1"
             )
