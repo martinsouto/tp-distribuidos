@@ -1,6 +1,6 @@
 db_config = {
     "USER": "root",
-    "PASSWORD": "password",
+    "PASSWORD": "1234",
     "HOST": "localhost",
     "DATABASE": "dssd"
 }

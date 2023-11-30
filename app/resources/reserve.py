@@ -33,8 +33,8 @@ def seleccionar_materiales(id_coleccion):
 def seleccion_materiales(id_coleccion):
     print("ENTREEEEEEEEEEEEEEEEEEEEEEEEEEEEEE PTM")
     materiales_todos = Material.materiales()
+    form = FormEleccionMateriales()
     if session["current_rol"] == "Operaciones":
-        form = FormEleccionMateriales()
         if form.validate_on_submit():
             """Template Seleccionar materiales"""
             materiales = request.form.getlist("materiales[]")
@@ -45,6 +45,27 @@ def seleccion_materiales(id_coleccion):
             listado = listado_api_materiales(token, materiales)
             # filtramos materiales obtenidos
             mats_obtenidos = [material["name"] for material in listado]
+            if (not materiales):
+                flash(
+                    "Debe seleccionar al menos un material", "error"
+                )
+                return render_template(
+                    "collection/seleccion_materiales.html",
+                    materiales=materiales_todos,
+                    id_coleccion=id_coleccion,
+                    form=form
+                )
+            if not (set(materiales) == set(mats_obtenidos)):
+                materiales_faltan = [i for i in materiales if i not in mats_obtenidos]
+                flash(
+                    "Faltan los siguientes materiales: " + str(materiales_faltan), "error"
+                )
+                return render_template(
+                    "collection/seleccion_materiales.html",
+                    materiales=materiales_todos,
+                    id_coleccion=id_coleccion,
+                    form=form
+                )
             # filtramos stocks para utilizarlos mas adelante
             stocks = [material["stock"] for material in listado]
             # filtramos delivery_time para utilizarlos mas adelante
@@ -57,16 +78,6 @@ def seleccion_materiales(id_coleccion):
             )
             assign_task(taskId)
             updateUserTask(taskId, "completed")
-            if not (set(materiales) == set(mats_obtenidos)):
-                materiales_faltan = [i for i in materiales if i not in mats_obtenidos]
-                flash(
-                    "Faltan los siguientes materiales: " + str(materiales_faltan), "error"
-                )
-                return render_template(
-                    "collection/seleccion_materiales.html",
-                    materiales=materiales_todos,
-                    id_coleccion=id_coleccion,
-                )
             return render_template(
                 "collection/guardar_materiales.html",
                 materiales=listado,
@@ -87,14 +98,14 @@ def seleccion_materiales(id_coleccion):
 
     flash("Algo falló", "error")
     return render_template(
-        "collection/seleccion_materiales.html", materiales=materiales_todos
+        "collection/seleccion_materiales.html", materiales=materiales_todos, id_coleccion=id_coleccion, form=form
     )
 
 
 @login_required
 def login_api_materiales():
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/login"
+    URL = "https://apidssd.onrender.com/login"
     #body = {"username": current_user.username, "password": "bpm"}
     #hardcodeo con el usuario y contraseña que tengo en la base de datos de render
     body = {"username": "martin", "password": "1234"}
@@ -110,7 +121,7 @@ def login_api_materiales():
 @login_required
 def listado_api_materiales(token, materiales):
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/materiales"
+    URL = "https://apidssd.onrender.com/materiales"
     body = {"names": materiales}
     headers = {"Content-Type": "application/json", "Authorization": "Bearer " + token}
     data = json.dumps(body)
@@ -122,7 +133,7 @@ def listado_api_materiales(token, materiales):
 @login_required
 def reservar_api_materiales(token, id_coleccion):
     requestSession = requests.Session()
-    URL = "http://127.0.0.1:7000/reservar_materiales"
+    URL = "https://apidssd.onrender.com/reservar_materiales"
     body = {
         "materials": eval(Coleccion.get_by_id(id_coleccion).materiales), #convierto el str a dict
         "user_id": int(get_user_id()),

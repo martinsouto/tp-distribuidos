@@ -49,7 +49,7 @@
                                     muebles</label>
                                 <div class="col-md-10">
                                     <input type="number" class="form-control" id="cantidad_muebles"
-                                        name="cantidad_muebles" value="0">
+                                        name="cantidad_muebles" value="0" min="0">
                                     {% for error in form.cantidad_muebles.errors %}
                                     <span style="color:red;">{{ error }}</span>
                                     {% endfor %}
