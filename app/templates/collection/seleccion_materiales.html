@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block title %}Nueva colección{% endblock %}
 {% block head %}
-{{ super() }}
-<script src="{{ url_for('static', filename='js/select2.js')}}" type="text/javascript"></script>
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/select2.js')}}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -31,11 +31,23 @@
                 <div class="card-header">Selección de materiales</div>
                 <div class="card-body">
                     <form class="form" method="POST" action="{{ url_for('collection.seleccion_materiales', id_coleccion=id_coleccion) }}">
-
+                        {{ form.hidden_tag() }} {# Agrega un campo oculto para protección CSRF #}
                         <div class="form-group">
+                             <!-- Agregamos bloque para mostrar errores -->
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        {% for field, errors in form.errors.items() %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
                             <div class="form-group row justify-content-center">
                                 <div class="col-md-10">
-                                    <label for="fecha_entrega">Fecha recepción de materiales:</label>
+                                    <label for="fecha_entrega">Fecha recepción de materiales</label>
                                     <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-control">
                                 </div>
                             </div>

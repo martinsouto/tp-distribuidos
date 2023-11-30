@@ -1,15 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, SubmitField, ValidationError
+from wtforms import DateField, SelectMultipleField, SubmitField, ValidationError
 from wtforms.validators import DataRequired
 from datetime import date
 
 
 class FormEleccionMateriales(FlaskForm):
     fecha_entrega = DateField(
-        "Fecha de entrega de materiales",
+        "Fecha recepción de materialess",
         default=date.today,
         validators=[DataRequired(message="El campo para la fecha de recepción es obligatorio")],
     )
+
     enviar = SubmitField("Guardar")
 
     def validate_fecha_entrega(self, field):

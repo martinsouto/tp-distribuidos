@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, render_template, url_for, flash, session,
 from flask_login import login_required, current_user
 import requests
 import json
+from app.form.coleccion.eleccion_materiales import FormEleccionMateriales
 from app.models.collection import Coleccion
 from app.models.material import Material
 from datetime import datetime
@@ -14,12 +15,14 @@ from app.resources.collection import bp
 @login_required
 def seleccionar_materiales(id_coleccion):
     if session["current_rol"] == "Operaciones":
+        form = FormEleccionMateriales()
         """Template Seleccionar materiales"""
         materiales = Material.materiales()
         return render_template(
             "collection/seleccion_materiales.html",
             materiales=materiales,
             id_coleccion=id_coleccion,
+            form=form,
         )
     else:
         flash("No tienes permiso para acceder a este sitio", "error")
@@ -31,45 +34,57 @@ def seleccion_materiales(id_coleccion):
     print("ENTREEEEEEEEEEEEEEEEEEEEEEEEEEEEEE PTM")
     materiales_todos = Material.materiales()
     if session["current_rol"] == "Operaciones":
-        """Template Seleccionar materiales"""
-        materiales = request.form.getlist("materiales[]")
-        #obtengo la fecha de entrega seleccionada
-        fecha_entrega = request.form.get("fecha_entrega")
-        print("LA FECHA DE ENTREGA SELECCIONADA ES: ", fecha_entrega)
-        token = login_api_materiales()
-        listado = listado_api_materiales(token, materiales)
-        # filtramos materiales obtenidos
-        mats_obtenidos = [material["name"] for material in listado]
-        # filtramos stocks para utilizarlos mas adelante
-        stocks = [material["stock"] for material in listado]
-        # filtramos delivery_time para utilizarlos mas adelante
-        delivery_time = [material["delivery_time"] for material in listado]
-        print("DELIVERY TIMEEEEEE", delivery_time)
-        print("MATERIALES OBTENIDOS", mats_obtenidos)
-        #Asigno y finalizo tarea de definición de materiales
-        taskId = getUserTaskByName(
-            "Definir Materiales necesarios", Coleccion.get_by_id(id_coleccion).case_id
-        )
-        assign_task(taskId)
-        updateUserTask(taskId, "completed")
-        if not (set(materiales) == set(mats_obtenidos)):
-            materiales_faltan = [i for i in materiales if i not in mats_obtenidos]
-            flash(
-                "Faltan los siguientes materiales: " + str(materiales_faltan), "error"
+        form = FormEleccionMateriales()
+        if form.validate_on_submit():
+            """Template Seleccionar materiales"""
+            materiales = request.form.getlist("materiales[]")
+            #obtengo la fecha de entrega seleccionada
+            fecha_entrega = request.form.get("fecha_entrega")
+            print("LA FECHA DE ENTREGA SELECCIONADA ES: ", fecha_entrega)
+            token = login_api_materiales()
+            listado = listado_api_materiales(token, materiales)
+            # filtramos materiales obtenidos
+            mats_obtenidos = [material["name"] for material in listado]
+            # filtramos stocks para utilizarlos mas adelante
+            stocks = [material["stock"] for material in listado]
+            # filtramos delivery_time para utilizarlos mas adelante
+            delivery_time = [material["delivery_time"] for material in listado]
+            print("DELIVERY TIMEEEEEE", delivery_time)
+            print("MATERIALES OBTENIDOS", mats_obtenidos)
+            #Asigno y finalizo tarea de definición de materiales
+            taskId = getUserTaskByName(
+                "Definir Materiales necesarios", Coleccion.get_by_id(id_coleccion).case_id
             )
+            assign_task(taskId)
+            updateUserTask(taskId, "completed")
+            if not (set(materiales) == set(mats_obtenidos)):
+                materiales_faltan = [i for i in materiales if i not in mats_obtenidos]
+                flash(
+                    "Faltan los siguientes materiales: " + str(materiales_faltan), "error"
+                )
+                return render_template(
+                    "collection/seleccion_materiales.html",
+                    materiales=materiales_todos,
+                    id_coleccion=id_coleccion,
+                )
             return render_template(
-                "collection/seleccion_materiales.html",
-                materiales=materiales_todos,
+                "collection/guardar_materiales.html",
+                materiales=listado,
+                stocks=stocks,
                 id_coleccion=id_coleccion,
+                fecha_entrega=fecha_entrega,
+                delivery_time=delivery_time,
             )
-        return render_template(
-            "collection/guardar_materiales.html",
-            materiales=listado,
-            stocks=stocks,
-            id_coleccion=id_coleccion,
-            fecha_entrega=fecha_entrega,
-            delivery_time=delivery_time,
-        )
+        else:
+            print("IMPRIMO ERROR DE FORMULARIO")
+            print(form.errors)
+            return render_template(
+                    "collection/seleccion_materiales.html",
+                    form=form,
+                    materiales=materiales_todos,
+                    id_coleccion=id_coleccion,
+                )
+
     flash("Algo falló", "error")
     return render_template(
         "collection/seleccion_materiales.html", materiales=materiales_todos
