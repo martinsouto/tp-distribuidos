@@ -29,7 +29,21 @@ def crear():
         if form.validate_on_submit():
             nombre = form.nombre.data
             fecha_lanzamiento = form.fecha_lanzamiento.data
-            modelos = request.form.getlist("modelos[]")
+            #modelos = request.form.getlist("modelos[]")
+            cant_modelos = request.form.getlist("cant_modelos[]")
+            print("#############################################################################################################################################")
+            modelos_todos = Modelo.modelos()
+            cant_muebles = 0
+            modelos = []
+            for i in range(len(cant_modelos)):
+                if int(cant_modelos[i]) > 0:
+                    cant_muebles += int(cant_modelos[i])
+                    modelos.append(str(i+1))
+            if (cant_muebles == 0):
+                flash("Debes incluir al menos un modelo", "error")
+                modelos = Modelo.modelos()
+                return render_template("collection/nuevo.html", form=form, modelos=modelos)
+            print("#############################################################################################################################################")
             # Se instancia la tarea
             case_id = init_process()
             while "Planificar la coleccion" not in get_ready_tasks(case_id):
@@ -52,7 +66,7 @@ def crear():
             Coleccion.crear(
                 case_id,
                 nombre,
-                form.cantidad_muebles.data,
+                cant_muebles,
                 fecha_lanzamiento,
                 fecha_lanzamiento - datetime.timedelta(10),
                 [1, 2, 3],

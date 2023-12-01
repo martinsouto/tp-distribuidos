@@ -18,7 +18,7 @@ class FormAltaColeccion(FlaskForm):
         default="",
     )
 
-    cantidad_muebles = IntegerField("Cantidad de muebles", validators=[NumberRange(min=1, max=999999, message="La cantidad de muebles debe ser mayor a 0"), DataRequired(message="El campo cantidad de muebles es obligatorio")])
+    #cantidad_muebles = IntegerField("Cantidad de muebles", validators=[NumberRange(min=1, max=999999, message="La cantidad de muebles debe ser mayor a 0"), DataRequired(message="El campo cantidad de muebles es obligatorio")])
 
     def validate_nombre(form, nombreV):
         coleccion = Coleccion.get_by_name(nombreV.data)
