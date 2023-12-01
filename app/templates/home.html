@@ -1,0 +1,280 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/formulario_eliminar.js')}}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='js/formulario_enviar.js')}}" type="text/javascript"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == "success" %}
+    <div class="alert alert-success alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="row justify-content-center">
+        <div class="col-md-16">
+            <div class="card align-self-center">
+                <div class="card-header">Colecciones
+                    {% if session["current_rol"] == "Creativa" %}
+                    <a class="badge badge-pill badge-primary" href="{{ url_for('collection.crear') }}"
+                        role="button">Nueva</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col-md-3">
+                                    Nombre colección
+                                </th>
+                                <th class="col-md-3">
+                                    Cantidad de muebles
+                                </th>
+                                <th class="col-md-3">
+                                    Fecha de lanzamiento
+                                </th>
+                                <th class="col-md-3">
+                                    Fecha de entrega
+                                </th>
+                                <th class="col-md-3">
+                                    Modelos
+                                </th>
+                                {% if session["current_rol"] == "Operaciones" %}
+                                <th class="col-md-3">
+                                    Reservas
+                                </th>
+                                <th class="col-md-3">
+                                    Fabricación
+                                </th>
+                                {% elif session["current_rol"] == "Comercial" %}
+                                <th class="col-md-3">
+                                    Distribución
+                                </th>
+                                {% elif session["current_rol"] == "Creativa" %}
+                                <th class="col-md-3">
+                                    Reprogramación
+                                </th>
+                                {% endif %}
+                                {% if session["current_rol"] == "Operaciones" %}
+                                <th class="col-md-3">
+                                    Cancelación
+                                </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for coleccion in current_user.colecciones %}
+                            <tr>
+                                <td class="col-md-3">
+                                    {{coleccion.name}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{coleccion.cantidad_muebles}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{coleccion.fecha_lanzamiento.strftime('%d-%m-%Y')}}
+                                </td>
+                                <td class="col-md-3">
+                                    {{coleccion.fecha_entrega.strftime('%d-%m-%Y')}}
+                                </td>
+                                <td class="col-md-3">
+                                    <button type="button" class="btn-sm btn-primary" data-toggle="modal"
+                                        data-target="#modelosModal{{coleccion.id}}">
+                                        Ver
+                                    </button>
+
+                                    <div class="modal fade" id="modelosModal{{coleccion.id}}" tabindex="-1"
+                                        role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Modelos de la
+                                                        coleccion {{coleccion.name}}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Nombre</th>
+                                                                <th scope="col">Descripción</th>
+                                                                <th scope="col">Tipo</th>
+                                                                <th scope="col">Imagen</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for modelo in coleccion.coleccion_tiene_modelo %}
+                                                            <tr>
+                                                                <td>{{modelo.name}}</td>
+                                                                <td>{{modelo.descripcion}}</td>
+                                                                <td>{{modelo.tipo.name}}</td>
+                                                                #la imagen de abajo es de prueba y hay que cambiarla por la direccion de la imagen de la base de datos
+                                                                <td>
+                                                                    <img src="https://media.istockphoto.com/photos/simple-classic-wooden-chair-isolated-on-white-background-studio-picture-id172410116?s=612x612"
+                                                                         alt="imagen" style="max-width: 100%; height: auto;">
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                {% if session["current_rol"] == "Operaciones" %}
+                                {% if "Definir Materiales necesarios" in get_ready_tasks(coleccion.case_id) %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.seleccionar_materiales', id_coleccion=coleccion.id) }}">Seleccionar
+                                        materiales</a>
+                                </td>
+                                {% elif "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.seleccionar_espacio', id_coleccion=coleccion.id) }}">Seleccionar
+                                        espacio de fabricación</a>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricacion" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion") %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-success"
+                                        href="{{ url_for('collection.recibir_materiales', id_coleccion=coleccion.id) }}">Marcar
+                                        materiales como recibidos</a>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") %}
+                                <td class="col-md-3">
+                                    <h6 style="color: green;">Materiales recibidos!</h6>  
+                                </td>
+                                {% else %}
+                                <td class="col-md-3 text-center"> - </td>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if session["current_rol"] == "Operaciones" %}
+                                {% if "Elaborar plan de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.planificar_fabricacion', id_coleccion=coleccion.id) }}">Elaborar
+                                        plan de fabricación</a>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion")
+                                %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.administrar_hitos', id_coleccion=coleccion.id) }}">
+                                        Ver hitos
+                                    </a>
+                                </td>
+                                {% else %}
+                                <td class="col-md-3 text-center"> - </td>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if session["current_rol"] == "Comercial" %}
+                                {% if "Iniciar planificacion de distribucion" in get_ready_tasks(coleccion.case_id) %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.nueva_distribucion', id_coleccion=coleccion.id) }}">Planificar Distribucion</a>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Iniciar planificacion de distribucion") %}
+                                <td class="col-md-3">
+                                    <a class="btn btn-primary"
+                                        href="{{ url_for('collection.ver_lotes', id_coleccion=coleccion.id) }}">Ver lotes</a>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Asociar lotes con las ordenes de distribucion") %}
+                                <td class="col-md-3">
+                                    <h6 style="color: green;">Lotes enviados!</h6>  
+                                </td>
+                                {% else %}
+                                <td class="col-md-3 text-center"> - </td>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if session["current_rol"] == "Creativa" %}
+                                {% if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id) or "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif get_completed_tasks_by_name(coleccion.case_id, "Reserva de espacio de fabricacion") and "Elaborar plan de fabricacion" not in get_ready_tasks(coleccion.case_id) and not get_completed_tasks_by_name(coleccion.case_id, "Elaborar plan de fabricacion") %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif "Esperar materiales" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% elif "Esperar finalizar hitos" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('collection.reprogramar', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit"
+                                            value="Reprogramar Colección">
+                                    </form>
+                                </td>
+                                {% else %}
+                                <td class="col-md-3 text-center"> - </td>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if session["current_rol"] == "Operaciones" %}
+                                {% if "Consulta de Disponibilidad de Materiales" in get_ready_tasks(coleccion.case_id) or "Consulta de espacio de fabricacion" in get_ready_tasks(coleccion.case_id) %}
+                                <td>
+                                    <form method="DELETE"
+                                        action="{{ url_for('collection.eliminar_coleccion', id_coleccion=coleccion.id) }}"
+                                        class="formulario-enviar" style="display: inline;">
+                                        <input class="btn btn-danger btn-sm" type="submit" value="Eliminar Colección">
+                                    </form>
+                                </td>
+                                {% else %}
+                                <td class="col-md-3 text-center"> - </td>
+                                {% endif %}
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

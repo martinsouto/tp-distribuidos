@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+{% block title %}Nueva colección{% endblock %}
+{% block head %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/formulario_eliminar.js')}}" type="text/javascript"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == "success" %}
+    <div class="alert alert-success alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Creación de hitos del plan de fabricación</div>
+                <div class="card-body">
+                    <form class="form" method="POST" action="{{ url_for('collection.elaborar_plan', id_coleccion=coleccion.id) }}">
+                        <div class="form-group">
+                            <div class="form-group row justify-content-center">
+                                <div class="col-md-10">
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th class="col align-self-center" colspan="4">
+                                                    Espacio de fabricación disponible: <a href="#"
+                                                        class="badge badge-pill badge-primary">Inicio:
+                                                        {{coleccion.inicio_fabricacion.strftime('%d-%m-%Y')}}</a> - <a
+                                                        href="#" class="badge badge-pill badge-primary">Fin:
+                                                        {{coleccion.fin_fabricacion.strftime('%d-%m-%Y')}}</a>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="col align-self-center" colspan="4">
+                                                    Hitos <button type="button" class="badge badge-pill badge-success"
+                                                        data-toggle="modal" data-target="#tareaModal">
+                                                        Nuevo hito
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Nombre
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Descripción
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Fecha Límite
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        *
+                                                    </td>
+                                                </div>
+                                            </tr>
+                                            {% if hitos %}
+                                            {% for hito in hitos %}
+                                            <tr>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{hito.nombre}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{hito.descripcion}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{hito.fecha_limite.strftime('%d-%m-%Y')}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        <form method="DELETE"
+                                                            action="{{ url_for('collection.eliminar_hito',id_coleccion=coleccion.id, id_hito=hito.id) }}"
+                                                            class="formulario-eliminar" style="display: inline;">
+                                                            <input class="btn btn-danger btn-sm" type="submit"
+                                                                value="Eliminar">
+                                                        </form>
+                                                    </td>
+                                                </div>
+                                            </tr>
+                                            {% endfor %}
+                                            {% else %}
+                                            <tr class="col-md-3" colspan="4">
+                                                <div class="col-md-3" colspan="4">
+                                                    <td class="col-md-3" colspan="4">
+                                                        No hay hitos  cargados.
+                                                    </td>
+                                                </div>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="form-group row justify-content-center">
+                                <div class="col-md-10">
+                                    <button type="submit" class="btn btn-primary">Finalizar planificación</button>
+                                </div>
+                            </div>
+                    </form>
+
+                    <!-- MODAL DE CREAR HITO -->
+                    <div class="modal fade" id="tareaModal" tabindex="-1" role="dialog"
+                        aria-labelledby="tareaModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="tareaModalLabel">Crear nuevo hito <a href="#"
+                                            class="badge badge-pill badge-primary">Fecha de fin de reserva de espacio:
+                                            {{coleccion.fin_fabricacion.strftime('%d-%m-%Y')}}</a></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form-horizontal" method="POST"
+                                        action="{{ url_for('collection.crear_hito', id_coleccion=coleccion.id)}}" novalidate>
+                                        {{ form.csrf_token }}
+                                        {{ form.hidden_tag() }}
+                                        <div class="form-group">
+                                            <div class="form-group row justify-content-center">
+                                                <label for="nombre"
+                                                    class="col-md-8 col-form-label text-md-left">Nombre</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="nombre" name="nombre"
+                                                        placeholder="" value="">
+                                                    {% for error in form.nombre.errors %}
+                                                    <span style="color:red;">{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="form-group row justify-content-center">
+                                                <label for="descripcion"
+                                                    class="col-md-8 col-form-label text-md-left">Descripción</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="descripcion"
+                                                        name="descripcion" placeholder="" value="">
+                                                    {% for error in form.descripcion.errors %}
+                                                    <span style="color:red;">{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="form-group row justify-content-center">
+                                                <label for="fecha_limite"
+                                                    class="col-md-8 col-form-label text-md-left">Fecha Límite</label>
+                                                <div class="col-md-8">
+                                                    <input type="date" class="form-control" id="fecha_limite"
+                                                        name="fecha_limite" placeholder=""
+                                                        value="{{coleccion.fin_fabricacion.date()}}">
+                                                    {% for error in form.fecha_limite.errors %}
+                                                    <span style="color:red;">{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row justify-content-center">
+                                            <div class="col-md-8">
+                                                <button type="submit" class="btn btn-primary">Cargar</button>
+                                                <button type="reset" class="btn btn-primary">Limpiar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

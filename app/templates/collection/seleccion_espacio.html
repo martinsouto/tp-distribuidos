@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block title %}Nueva colección{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == "success" %}
+    <div class="alert alert-success alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Selección de espacio de fabricación</div>
+                <div class="card-body">
+                    <form class="form" method="POST"
+                        action="{{ url_for('collection.reservar_espacio', id_coleccion=id_coleccion) }}">
+
+                        <div class="form-group">
+                            <div class="form-group row justify-content-center">
+                                <div class="col-md-10">
+
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th class="col align-self-center" colspan="5">
+                                                    Espacios entre <a href="#" class="badge badge-pill badge-primary">Recepción de materiales: {{fecha_recepcion_materiales.strftime('%d-%m-%Y')}}</a> - <a href="#" class="badge badge-pill badge-primary">Fecha de entrega: {{fecha_entrega.strftime('%d-%m-%Y')}}</a>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Nombre
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Fecha Inicio
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Fecha Fin
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        Seleccionar
+                                                    </td>
+                                                </div>
+                                            </tr>
+                                            {% for espacio in espacios %}
+                                            <tr>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{espacio.name}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{espacio.start_date}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        {{espacio.end_date}}
+                                                    </td>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <td class="col-md-3">
+                                                        <input type="radio" id="{{espacio.id}}" name="espacio"
+                                                            value="{{espacio.id}}" data-on="Si" data-off="No"
+                                                            data-toggle="toggle" data-size="sm">
+                                                    </td>
+                                                </div>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="form-group row justify-content-center">
+                                <div class="col-md-10">
+                                    <button type="submit" class="btn btn-primary">Cargar</button>
+                                    <button type="reset" class="btn btn-primary">Limpiar</button>
+                                </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

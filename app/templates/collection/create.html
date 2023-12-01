@@ -1,17 +1,28 @@
 {% extends 'base.html' %}
 
-{% block title %}Creacion de coleccion{% endblock%}
+{% block title %}Creación de colección{% endblock%}
 
 {% block header %}
 <h1>Creación de colección</h1>
-{% endblock%}
+{% endblock %}
 
-{% block content%}
+{% block content %}
 <form action="" method="post">
-    <p><label for="description">Description </label>
-    <br>
-    <input type="text" name="description" id="description" required></p>
-    <p><input type="submit" value="Create" name="create" id="create">
-    <input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
+    {{ form.hidden_tag() }} {# Agrega un campo oculto para protección CSRF #}
+    <p><label for="{{ form.nombre.id }}">Nombre</label></p>
+    <p>{{ form.nombre(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.descripcion.id }}">Descripción</label></p>
+    <p>{{ form.descripcion(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.plazo_fabricacion.id }}">Plazo de fabricación (en días)</label></p>
+    <p>{{ form.plazo_fabricacion(size=40, required="required") }}</p>
+
+    <p><label for="{{ form.fecha_lanzamiento_estimada.id }}">Fecha de lanzamiento estimada</label></p>
+    <p>{{ form.fecha_lanzamiento_estimada(size=40, required="required") }}</p>
+
+    <p><input type="submit" value="Cancel" name="cancel" id="cancel" formnovalidate></p>
+    <p><input type="submit" value="Add models" name="next" id="next"></p>
 </form>
-{% endblock%}
+{% endblock %}
+
